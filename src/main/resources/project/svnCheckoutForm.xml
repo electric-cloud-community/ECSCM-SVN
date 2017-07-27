@@ -1,0 +1,61 @@
+<editor>
+    <help>/commander/pages/@PLUGIN_NAME@/@PLUGIN_KEY@_help?s=Administration&amp;ss=Plugins#CheckoutCode</help>
+    <formElement>
+        <type>entry</type>
+        <label>Configuration:</label>
+        <property>config</property>
+        <required>1</required>
+        <documentation>This parameter must have the name of the configuration created in the "Plugin Configuration Parameters" section for this plugin.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>SVN command line utility:</label>
+        <property>command</property>
+        <required>0</required>
+        <documentation>Absolute path to the svn command line tool.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Destination Directory:</label>
+        <property>dest</property>
+        <documentation>Indicate the path relative to the job's workspace where the source tree will be created.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Revision:</label>
+        <property>SubversionRevision</property>
+        <documentation>The revision number to checkout.</documentation>
+    </formElement>
+    <formElement>
+        <type>select</type>
+        <label>Checkout Type:</label>
+        <property>CheckoutType</property>
+        <required>1</required>
+        <value>D</value>
+        <documentation>Select the type of checkout you want to perform.</documentation>
+        <option><name>Directory</name><value>D</value></option>
+        <option><name>File</name><value>F</value></option>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>File(s) to download:</label>
+        <property>FileName</property>
+        <documentation>Name of the file you want to download from the repository (Only used when the Checkout type is marked as "File"). you can provide multiple files if you separate them with a "|" character.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Repository:</label>
+        <property>SubversionUrl</property>
+        <required>1</required>
+        <documentation>This is the location of the subversion repository directory to use. Note: In case you need to checkout code from several svn repositories separate them with a "|" character. Example: svn://svnserver/test/perl files|svn://svnserver/test/ruby files.</documentation>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Ignore Externals:</label>
+        <property>IgnoreExternals</property>
+        <checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <required>0</required>
+        <documentation>If checked it tells Subversion to ignore externals definitions and the external working copies managed by them.</documentation>
+    </formElement>
+</editor>

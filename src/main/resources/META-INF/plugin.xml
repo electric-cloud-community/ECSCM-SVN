@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+    <key>ECSCM-SVN</key>
+    <version>@PLUGIN_VERSION@</version>
+    <label>ECSCM-SVN</label>
+    <description>SCM Plugin for SVN</description>
+    <author>Electric Cloud</author>
+    <authorUrl>http://www.electric-cloud.com/support</authorUrl>
+    <category>Source Code Management</category>
+    <commander-version min="3.6"/>
+    <depends min="2.2.2">ECSCM</depends>
+    <customTypes>
+        <customType name="reports">
+            <displayName>Display SVN Changelog Report</displayName>
+            <description>description for SVN reports custom type.</description>
+            <page pageName="svnReports" definition="pages/reports.xml"/>
+        </customType>
+        <customType name="CheckoutCode">
+            <parameterPanel>
+                <javascript>war/ecplugins.ECSCM.CheckoutCodeParameterPanel/ecplugins.ECSCM.CheckoutCodeParameterPanel.nocache.js</javascript>
+                <help>/commander/pages/@PLUGIN_KEY@-@PLUGIN_VERSION@/ECSCM-SVN_help?s=Administration&amp;ss=Plugins#CheckoutCode</help>
+            </parameterPanel>
+        </customType>
+    </customTypes>
+    <components>
+        <component name="Reports">
+            <javascript>war/ecplugins.ECSCM.Reports/ecplugins.ECSCM.Reports.nocache.js</javascript>
+        </component>
+        <component name="CheckoutCodeParameterPanel">
+            <javascript>war/ecplugins.ECSCM.CheckoutCodeParameterPanel/ecplugins.ECSCM.CheckoutCodeParameterPanel.nocache.js</javascript>
+        </component>
+    </components>
+    <help>ECSCM-SVN_help.xml</help>
+</plugin>

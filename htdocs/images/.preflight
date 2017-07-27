@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+    <server>
+        <userName>admin</userName>
+        <password>changeme</password>
+        <hostName>localhost</hostName>
+    </server>
+    <procedure>
+        <projectName>SVN</projectName>
+        <procedureName>SVN Preflight</procedureName>
+        <jobTimeout>7200</jobTimeout>
+    </procedure>
+    <scm>
+        <type>ECSCM-SVN</type>
+        <user>carlos</user>
+        <path>C:\svntest</path>
+        <updatetohead>1</updatetohead>
+        <ignoreexternals>1</ignoreexternals>
+    </scm>
+</data>

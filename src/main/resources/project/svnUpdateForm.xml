@@ -1,0 +1,32 @@
+<editor>
+    <help>/commander/pages/@PLUGIN_NAME@/@PLUGIN_KEY@_help?s=Administration&amp;ss=Plugins#Update</help>
+    <formElement>
+        <type>entry</type>
+        <label>Configuration:</label>
+        <property>config</property>
+        <required>1</required>
+        <documentation>This parameter must have the name of the configuration created in the "Plugin Configuration Parameters" section for this plugin.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>SVN command line utility:</label>
+        <property>command</property>
+        <required>0</required>
+        <value>svn</value>
+        <documentation>Absolute path to the svn command line tool.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>SVN Working Directory:</label>
+        <property>dest</property>
+        <required>1</required>
+        <documentation>Path to the existing svn working copy to update.</documentation>
+    </formElement>
+    <formElement>
+        <type>entry</type>
+        <label>Revision:</label>
+        <property>revision</property>
+        <required>0</required>
+        <documentation>Provide an specific revision to update to.</documentation>
+    </formElement>
+</editor>

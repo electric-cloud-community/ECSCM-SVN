@@ -1,0 +1,792 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="generator"
+          content="HTML Tidy for Windows (vers 14 February 2006), see www.w3.org" />
+    <meta content="text/html; charset=us-ascii"
+          http-equiv="content-type" />
+
+    <title>Electric Commander Plugin for Subversion</title>
+    <link rel="stylesheet"
+          href="../../plugins/@PLUGIN_KEY@/pluginhelp.css"
+          type="text/css"
+          media="screen" />
+</head>
+
+<body>
+    <div class="help">
+        <h1>Subversion</h1>
+
+        <p>Plugin Version @PLUGIN_VERSION@</p>
+        <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;"
+            noshade="noshade" />
+
+        <p>Subversion (often abbreviated SVN, after the command
+        name svn) is a software versioning and a revision control
+        system distributed under a free license. Developers use
+        Subversion to maintain current and historical versions of
+        files such as source code, web pages, and documentation.
+        Its goal is to be a mostly-compatible successor to the
+        widely used Concurrent Versions System (CVS).</p>
+
+        <h2>Subversion Links</h2>
+
+        <p>More information can be found at:</p>
+
+        <ul>
+            <li><a href="http://subversion.tigris.org/">Subversion
+            site</a></li>
+
+            <li>
+            <a href="http://svnbook.red-bean.com/en/1.0/svn-book.pdf">
+            Subversion technical documentation</a></li>
+        </ul>
+
+        <h2>Electric Commander Integration to Subversion</h2>
+
+        <p>The ECSCM-SVN plugin allows you to connect the
+        Subversion source control server to ElectricCommander. This
+        plugin enables you to perform code checkouts, preflight
+        builds, and continuous integration.</p>
+
+        <h2>Integrated Version</h2>
+
+        <p>This plugin was developed and tested against version
+        1.6.6.</p>
+
+        <h1>Plugin Procedures</h1>
+
+        <p>IMPORTANT: For all parameter descriptions below,
+        required parameters are shown in
+        <span class='required'>bold italics</span>.</p>
+
+        <div id="CreateConfiguration">
+            <a name='CreateConfiguration'
+                 id="CreateConfiguration"></a> 
+
+            <h3>Plugin Configuration</h3>
+
+            <p>Plugin configurations are sets of parameters that
+            apply across some or all of the plugin's procedures.
+            They are intended to reduce repetition of common
+            values, create predefined sets of parameters for end
+            users, and to securely store credentials where needed.
+            Each configuration is given a unique name that is
+            entered in designated parameters on procedures that use
+            them.<br />
+            <br />
+             Plugin configurations are created by going to the
+            Electric Commander "Administration" tab, then to the
+            "Source Control" sub-tab.</p>
+            <!-- For all parameters, the parameter name should be *exactly* the same as it appears in the
+                                        Parameter Panel, and the first sentence(s) of the description should be
+                                        the same as the tooltip (if there is one). After that, the parameter
+                                        description can go into greater detail about the parameter including
+                                        valid value ranges and examples.
+                                        -->
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class='required'>SCM Type</td>
+
+                        <td>Select the SCM Type, in this case
+                        "Subversion". (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Configuration
+                        Name</td>
+
+                        <td>Provide a unique name for the
+                        configuration, keeping in mind that you may
+                        need to create additional configurations
+                        over time. (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Description</td>
+
+                        <td>You can supply a text description only
+                        for your reference. Commander does not use
+                        this information.</td>
+                    </tr>
+
+                    <tr>
+                        <td>User Name</td>
+
+                        <td>Provide the user name Commander uses to
+                        communicate with the Subversion
+                        server.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Password and Retype Password</td>
+
+                        <td>Provide the password for the specified
+                        User Name.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="CheckoutCode">
+            <a name='CheckoutCode'
+                 id="CheckoutCode"></a> 
+
+            <h3>CheckoutCode</h3>
+
+            <p>Downloads a private copy of the last version of the
+            project. This will perform a svn checkout command in
+            the desired destination.</p>
+			<p>When the procedure finishes you can check in the job, a property sheet called ecscm_changelogs,
+			you can see the changes included in this checkout since the latest. This information will be copied to the procedure too.</p>
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class='required'>Configuration</td>
+
+                        <td>This parameter must have the name of
+                        the configuration created in the "Plugin
+                        Configuration Parameters" section for this
+                        plugin. (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Destination Directory</td>
+
+                        <td>Indicate the path relative to the job's
+                        workspace where the source tree will be
+                        created.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Revision</td>
+
+                        <td>The revision number to checkout.</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Checkout Type</td>
+
+                        <td>Select the type of checkout you want to
+                        perform. Most of the users use the
+                        Directory option.(Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td>File(s) to download</td>
+
+                        <td>Name of the file you want to download
+                        from the repository (Only used when the
+                        Checkout type is marked as "File").<br />
+                         You can provide multiple files if you
+                        separate them with a "|" character.<br />
+                         Example: firstFile.txt|secondFile.txt</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Repository</td>
+
+                        <td>This is the location of the subversion
+                        repository directory to use.<br />
+                         Note: In case you need to checkout code
+                        from several svn repositories separate them
+                        with a "|" character.<br />
+                         Example: svn://svnserver/test/perl
+                        files|svn://svnserver/test/ruby files.
+                        (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ignore Externals</td>
+
+                        <td>If checked it tells Subversion to
+                        ignore externals definitions and the
+                        external working copies managed by them.
+                        (This is the command-line
+                        '--ignore-externals' option).</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Revision (output property path)</td>
+                        <td>Property where the last revision number will be stored.</td>
+                    </tr>
+                    
+                </tbody>
+            </table><img src="../../plugins/@PLUGIN_KEY@/images/checkout-2.png"
+                 alt="screenshot" />
+        </div>
+        
+        <div id="Update">
+            <a name='Update'
+                 id="Update"></a> 
+
+            <h3>Update</h3>
+
+            <p>Brings changes from the repository into your working copy.</p>
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class='required'>Configuration</td>
+
+                        <td>This parameter must have the name of
+                        the configuration created in the "Plugin
+                        Configuration Parameters" section for this
+                        plugin. (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Svn Working Directory</td>
+
+                        <td>Path to the existing svn working copy to update. (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Revision</td>
+
+                        <td>Provide an specific revision to update to.</td>
+                    </tr>
+                    
+                </tbody>
+            </table><img src="../../plugins/@PLUGIN_KEY@/images/Update-1.png"
+                 alt="screenshot" />
+        </div>
+
+        <div id="CommitChanges">
+            <a name='CommitChanges'
+                 id="CommitChanges"></a> 
+
+            <h3>CommitChanges</h3>
+
+            <p>Commit pending changes in svn working copies.</p>
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class='required'>Configuration</td>
+
+                        <td>This parameter must have the name of
+                        the configuration created in the "Plugin
+                        Configuration Parameters" section for this
+                        plugin. (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td class='required'>Svn Directory</td>
+
+                        <td>Path to your svn working copy.
+                        (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Commit message</td>
+
+                        <td>A commit message.</td>
+                    </tr>
+                </tbody>
+            </table><img src="../../plugins/@PLUGIN_KEY@/images/commit-1.png"
+                 alt="screenshot" />
+        </div>
+
+        <div id="Preflight (client side)">
+            <a name='Preflight (client side)'
+                 id="Preflight (client side)"></a> 
+
+            <h3>Preflight (client side)</h3>
+
+            <p>This will excecute the client part of the
+            preflight.</p>
+
+            <p>This parameters can be set in the .preflight file,
+            or passed directly to the ecclientpreflight tool.<br />
+             Multiple "path" parameters are allowed in the
+            .preflight file.<br />
+             In command line you can provide several --svnpath.</p>
+
+            <h3>Preflight parameters</h3>
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class='required'>Configuration</td>
+
+                        <td>This parameter must have the name of
+                        the configuration created in the "Plugin
+                        Configuration Parameters" section for this
+                        plugin. (Required)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Destination Directory</td>
+
+                        <td>Indicate the path relative to the job's
+                        workspace where the source tree will be
+                        created.</td>
+                    </tr>
+                    <tr>
+                        <td>Update when possible</td>
+
+                        <td>If checked, the plugin will prefer to update the repository rather than a full checkout.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="Preflight (agent side)">
+            <a name='Preflight (agent side)'
+                 id="Preflight (agent side)"></a> 
+
+            <h3>Preflight (agent side)</h3>
+
+            <p>This will execute the agent side part of the
+            preflight.</p>
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>svnpath</td>
+
+                        <td>The path to the locally accessible
+                        source directory in which changes have been
+                        made. This is generally the path to the
+                        root of the workspace.</td>
+                    </tr>
+
+                    <tr>
+                        <td>svnupdatetohead</td>
+
+                        <td>Use this option to have the agent
+                        workspace created during preflight be
+                        updated to HEAD. By default, the agent
+                        workspace is updated to the revision found
+                        in the client workspace. NOTE: there is not
+                        argument to this option.</td>
+                    </tr>
+
+                    <tr>
+                        <td>svnchangelist</td>
+
+                        <td>Use this option to preflight changes
+                            only from specified SVN changelist.</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>svnignoreexternals</td>
+
+                        <td>Causes the preflight process to ignore
+                        svn externals. NOTE: there is not argument
+                        to this option.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="getSCMTag">
+            <a name='getSCMTag'
+                 id="getSCMTag"></a> 
+
+            <h3>getSCMTag</h3>
+
+            <p>This procedure is used for Continuous Integration.
+            This will monitor the repository to discover whether
+            something changed, and trigger a preconfugured
+            procedure.</p>
+			<p>If the procedure to execute is a checkout, the procedure will copy the changelog into the schedule in a property sheet
+			called ecscm_changelogs.</p>
+
+            <table class="grid">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class='required'>Repository</td>
+
+                        <td>The Subversion repository to use. It
+                        can take two forms: A single, specific
+                        path, or multiple depot paths, separated
+                        them by a new line. (Required)</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Revision (output property path)</td>
+
+                        <td>Property where the last revision number will be stored.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Quiet time minutes</td>
+
+                        <td>The number of minutes of no check-in
+                        activity required before launching the
+                        procedure.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Enabled for ElectricSentry</td>
+
+                        <td>Enable this schedule for
+                        ElectricSentry.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <h1>Examples and Use Cases</h1>
+
+        <h2>Configure a Checkout</h2>
+
+        <p>In the create step pop-up, select the tab "SCM", from
+        this tab select the "Subversion - Checkout" type and click
+        OK</p>
+
+        <p>Fill the form, in this example we are using a
+        configuration called "SVN" and we are going to checkout a
+        repository from a svn server
+        machine.</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-2.png"
+             alt="Fill the form" /> 
+
+        <p>The procedure now should look like this one, not you can
+        run
+        it</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-3.png"
+             alt="The procedure is ready to run." /> 
+
+        <p>If everything was properly set now you shoud see
+        something like
+        this.</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-4.png"
+             alt="The procedure result." /> 
+
+        <p>If you see everything green, the procedure worked fine,
+        so you can now take a look at the logs. If you click on the
+        log, for the CheckOutMethod subprocedure "runMethod", you
+        will see something like
+        this.</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-5.png"
+             alt="The procedure log." />
+        
+        <h2>Update existing svn working directory</h2>
+
+        <p>Create a new "SVN - Update" step from the step picker.</p>
+        
+        <p>Fill the parameters in the step.</p><img src="../../plugins/@PLUGIN_KEY@/images/Update-2.png"
+             alt="Parameters" />
+        
+        <p>Run the procedure and see the log</p><img src="../../plugins/@PLUGIN_KEY@/images/Update-3.png"
+             alt="Log" />
+        
+        <h2>Preflight</h2>
+
+        <h3>Configuring the preflight</h3>
+
+        <p>In the create step pop-up, select the tab "SCM", from
+        this tab select the "Extract Preflight Sources" type and
+        click OK</p>
+
+        <p>Select a Step name, in this example we used
+        "PreflightStep", from the select list, pick the SVN
+        configuration that you want to use, we chose SVN and
+        provide a destination
+        directory.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-2.png"
+             alt="" /> 
+
+        <p>The procedure should look like
+        this.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-3.png"
+             alt="" /> 
+
+        <h3>Running the preflight</h3>
+
+        <p>In order to run a preflight we should make changes to
+        some files.<br />
+         In this example we used a
+        <a href="../../plugins/@PLUGIN_KEY@/images/.preflight">.preflight</a>
+        file that ecclientpreflight will read in order to read the
+        values in it and execute the procedure at commander.</p>
+
+        <p>Once we have the preflight file ready we just need to
+        call the "ecclientpreflight" tool from a console.<br />
+         You will see how it copies all the changed files to the
+        server, and lauches the preflight procedure that we created
+        earlier.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-4.png"
+             alt="" /> 
+
+        <p>If you go to the commander jobs tab, you will see our
+        recently launched
+        job.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-5.png"
+             alt="" /> 
+
+        <p>You can see the log file by clicking on the log
+        link.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-6.png"
+             alt="" /> 
+
+        <h2>Configuring a sentry schedule Form</h2>
+
+        <p>In the project, select the "schedules" tab, then in the
+        pop-up select the "SCM"
+        type.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-1.png"
+             alt="" /> 
+
+        <p>Select an step name, in this case we used "my sentry",
+        also select a SVN configuration. Then you should select the
+        procedure that will be run when the sentry is triggered. In
+        this case we chose the project "SVN" and the procedure name
+        inside the project called "runWithSentry", this procedure
+        just echoes a simple "hello world"
+        message</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-2.png"
+             alt="" /> 
+
+        <p>After that, a new form will be shown where you should
+        type our svn
+        repository.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-3.png"
+             alt="" /> 
+
+        <p>The schedule should look like
+        this.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-4.png"
+             alt="" /> 
+
+        <p>The sentry will detect new changes and execute the
+        runWithSentry procedure, in our case it just prints a
+        "Hello work
+        message".</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-5.png"
+             alt="" /> 
+
+        <p>The runWithSentry job, should be visible now from the
+        jobs
+        tab.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-6.png"
+             alt="" /> 
+
+        <h2>How to commit changes</h2>
+
+        <p>Create a CommitChanges procedure from the step picker
+        section</p>
+
+        <p>Fill the parameter panel with the correct
+        parameters.</p><img src="../../plugins/@PLUGIN_KEY@/images/commit-1.png"
+             alt="" /> 
+
+        <p>Run the procedure and see the log file if you
+        want</p><img src="../../plugins/@PLUGIN_KEY@/images/commit-2.png"
+             alt="" /> 
+
+        <h1>Release Notes</h1>
+
+        <h2>@PLUGIN_KEY@ 3.3.1</h2>
+        <ul>
+            <li>Fix preflight with autocommit option for Windows.</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 3.3.0</h2>
+        <ul>
+            <li>Added support for preflighting SVN changelists.</li>
+        </ul>
+        
+        <h2>@PLUGIN_KEY@ 3.2.4</h2>
+        <ul>
+            <li>Added ability to specify svn commandline utility path.</li>
+        </ul>
+        
+        <h2>@PLUGIN_KEY@ 3.2.3</h2>        <ul>            <li>The updateLastGoodAndLastCompleted procedure has been removed from this plugin.</li>            <li>Changelog will contain the last revision if no last successful job exists.</li>						        </ul>        		<h2>@PLUGIN_KEY@ 3.2.0</h2>
+
+        <ul>
+            <li>Revision (output property path) parameter added for checkout and sentry procedures</li>
+        </ul>
+        
+        <h2>@PLUGIN_KEY@ 3.1.0</h2>
+
+        <ul>
+            <li>Update procedure was added</li>
+            <li>The "Update when possible" parameter was added to the preflight procedure.</li>
+        </ul>
+        
+        <h2>@PLUGIN_KEY@ 3.0.0</h2>
+
+        <ul>
+            <li>GWT dynamic parameters were added for the checkout procedure.</li>
+        </ul>
+        
+        <h2>@PLUGIN_KEY@ 2.0.7</h2>
+
+        <ul>
+            <li>Step chooser name cleanup</li>
+        </ul>
+
+		<h2>@PLUGIN_KEY@ 2.0.6</h2>
+
+        <ul>
+		    <li>Added a custom changelog report.</li>    
+            <li>The changelog now will work with the sentry schedules too.</li>                
+        </ul>
+		
+        <h2>@PLUGIN_KEY@ 2.0.4</h2>
+
+        <ul>
+            <li>Commit procedure was added.</li>
+
+            <li>The plugin now prevents from error svn:
+            E020024</li>
+
+            <li>Expose preflight method in step pickers</li>
+            
+            <li>Support for multiple projects.</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 2.0.3</h2>
+
+        <ul>
+            <li>Improves to the help page document.</li>
+
+            <li>Credentials were added to "svn status" and "svn
+            log" commands during the preflight.</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 2.0.2</h2>
+
+        <ul>
+            <li>Improve xml parameter panels.</li>
+
+            <li>New help page format.</li>
+
+            <li>The "Ignore Externals" parameter was added to the
+            checkout procedure.</li>
+
+            <li>Multiple paths feature was fixed.</li>
+
+            <li>File(s) checkout feature.</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.10</h2>
+
+        <ul>
+            <li>Fixing autocommit errors.</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.9</h2>
+
+        <ul>
+            <li>Fixing error in the path of single url
+            repositories.</li>
+
+            <li>Fixing multiple paths not to add additional "\" to
+            the checkout directory name.</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.8</h2>
+
+        <ul>
+            <li>Support multiple paths (separated by |)</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.7</h2>
+
+        <ul>
+            <li>Improve the naming schema for the changelog
+            property.</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.6</h2>
+
+        <ul>
+            <li>Fixing preflight errors are presented.</li>
+
+            <li>In CheckoutCode proc, make SubversionRevision
+            optional.</li>
+
+            <li>Explicitly supply user credentials for CheckoutCode
+            function.</li>
+
+            <li>Add documentation for the use of the
+            svnupdatetohead and svnignoreexternals options</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.5</h2>
+
+        <ul>
+            <li>Added use of SVN version for the property
+            "trust-server-cert"</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.3</h2>
+
+        <ul>
+            <li>Updated help page</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.2</h2>
+
+        <ul>
+            <li>Added multiple repository management for
+            Sentry</li>
+
+            <li>Added use of SVN version for the property
+            "non-interactive" for checkout</li>
+        </ul>
+
+        <h2>@PLUGIN_KEY@ 1.1.1</h2>
+
+        <ul>
+            <li>SCM features - Sentry</li>
+
+            <li>SCM features - Checkout</li>
+
+            <li>SCM features - Preflight</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+// -*- Groovy -*-
+// build.gradle
+//
+// Gradle build script for EC-JBoss plugin.
+//
+// Copyright (c) 2015 Electric Cloud, Inc.
+// All rights reserved
+
+buildscript {
+    repositories {
+    	maven {
+    		url 'http://dl.bintray.com/ecpluginsdev/maven'
+    	}
+
+    	jcenter()
+    }
+    dependencies {
+        classpath group: 'com.electriccloud.plugins', name: 'flow-gradle-plugin', version: '+'
+    }
+}
+
+group = "com.electriccloud"
+description = "Plugins : ECSCM-SVN"
+version = "3.3.2"
+
+apply plugin: 'flow-gradle-plugin'
+apply plugin: 'license'
+
+// license {
+//     header = file ('shortHeader.txt')
+//     exclude "**/project.xml"
+// }
+
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.3'
+}
+
