@@ -851,6 +851,16 @@
                                         </property>
                                     </propertySheet>
                                 </property>
+                                <property>
+									<propertyName>svnCheckExternals</propertyName>
+                                    <propertySheet>
+                                        <property>
+                                            <propertyName>formType</propertyName>
+                                            <expandable>1</expandable>
+                                            <value>standard</value>
+                                        </property>
+                                    </propertySheet>
+                                </property>
                             </propertySheet>
                         </property>
                     </propertySheet>
@@ -889,6 +899,13 @@
                 <description>Property where the last revision number will be stored.</description>
                 <required>0</required>
                 <type>entry</type>
+            </formalParameter>
+            <formalParameter>
+                <formalParameterName>svnCheckExternals</formalParameterName>
+                <defaultValue>0</defaultValue>
+                <description>Check externals for updates</description>
+                <required>1</required>
+                <type>checkbox</type>
             </formalParameter>
             <step>
                 <stepName>tagMethod</stepName>

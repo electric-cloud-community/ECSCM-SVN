@@ -21,7 +21,7 @@ buildscript {
 
 group = "com.electriccloud"
 description = "Plugins : ECSCM-SVN"
-version = "3.3.2"
+version = "3.3.3"
 
 apply plugin: 'flow-gradle-plugin'
 apply plugin: 'license'

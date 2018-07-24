@@ -1,6 +1,6 @@
 ####################################################################
 #
-# ECSCM::SVN::Driver  Object to represent interactions with 
+# ECSCM::SVN::Driver  Object to represent interactions with
 #        SVN.
 ####################################################################
 package ECSCM::SVN::Driver;
@@ -29,7 +29,7 @@ if (!defined ECSCM::SVN::Cfg) {
 # Inputs
 #    cmdr          previously initialized ElectricCommander handle
 #    name          name of this configuration
-#                 
+#
 ####################################################################
 sub new {
     my ($this, $cmdr, $name) = @_;
@@ -37,7 +37,7 @@ sub new {
 
     my $cfg = new ECSCM::SVN::Cfg($cmdr, "$name");
     my $pluginKey = undef;
-    
+
     if ($name ne "") {
         $pluginKey = $cfg->getSCMPluginName();
         if ($pluginKey ne "ECSCM-SVN") { die "SCM config $name is not type ECSCM-SVN"; }
@@ -47,7 +47,7 @@ sub new {
 
     # Force svn output to be in english
     $ENV{LANG}="en_US.UTF-8";
-    
+
     my $xpath = $cmdr->getPlugin($pluginKey);
     my $pluginName = $xpath->findvalue('//pluginVersion')->value;
     print "\nUsing plugin $pluginKey version $pluginName\n";
@@ -61,10 +61,10 @@ sub new {
 ####################################################################
 sub isImplemented {
     my ($self, $method) = @_;
-    
-    if ($method eq 'getSCMTag' || 
-        $method eq 'checkoutCode' || 
-        $method eq 'apf_driver' || 
+
+    if ($method eq 'getSCMTag' ||
+        $method eq 'checkoutCode' ||
+        $method eq 'apf_driver' ||
         $method eq 'cpf_driver') {
         return 1;
     } else {
@@ -72,19 +72,21 @@ sub isImplemented {
     }
 }
 
+
+
 ####################################################################
 # get scm tag for sentry (continuous integration)
 ####################################################################
 
 ####################################################################
 # getSCMTag
-# 
+#
 # Get the latest changelist on this branch/client
 #
 # Args:
-# Return: 
+# Return:
 #    changeNumber - a string representing the last change sequence #
-#    changeTime   - a time stamp representing the time of last change     
+#    changeTime   - a time stamp representing the time of last change
 ####################################################################
 sub getSCMTag {
     my ($self, $opts) = @_;
@@ -98,27 +100,26 @@ sub getSCMTag {
     }
 
     # Load userName and password from the credential
-    ($opts->{svnUserName}, $opts->{svnPassword}) = 
-        $self->retrieveUserCredential($opts->{credential}, 
+    ($opts->{svnUserName}, $opts->{svnPassword}) =
+        $self->retrieveUserCredential($opts->{credential},
         $opts->{svnUserName}, $opts->{svnPassword});
 
     if (length ($opts->{repository}) == 0) {
         $self->issueWarningMsg ("No Subversion Repository was specified.");
         return (undef,undef);
     }
-    
+
     my $passwordStart = 0;
     my $passwordLength = 0;
     my $revisionNumber = undef;
     my $revisionTimeString = "";
-    my $changeTimestamp;
-    my $currentTimestamp;
-    
+    my $changeTimestamp = 0;
+
     #Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version --quiet|;
 
     my $cmndReturn = $self->RunCommand($svnCommand, {LogCommand => 1, LogResult => 0 } );
-    $cmndReturn =~ /version (\d+).(\d+)/;
+    $cmndReturn =~ /(\d+)\.(\d+)/;
     my $options = qq| --xml|;
     if(1 <= $1 && 5 <= $2){
         $options .= qq| --non-interactive|;
@@ -127,89 +128,83 @@ sub getSCMTag {
         $options .= qq| --trust-server-cert|;
     }
 
-    #manage multiple repositories
-    my $nDepots = 0;
+	$svnCommand = qq|${\($self->getSVNCommand())} | . $options;
+
+	# add the options
+	$svnCommand .= " --username $opts->{svnUserName}" if (length ($opts->{svnUserName}) > 0);
+	if (length ($opts->{svnPassword}) > 0) {
+		$svnCommand .= " --password ";
+		$passwordStart = length $svnCommand;
+		$svnCommand .= "$opts->{svnPassword}";
+		$passwordLength = (length $svnCommand) - $passwordStart;
+	}
+
+	#manage multiple repositories
+	my @revisions = ();
+	my $reposSeen = {};
     my @lines = split(/\n/, $opts->{repository});
+
+	my $closure;
+
+	$closure = sub {
+		my $repo = shift;
+		my ($xPath, $revision, $timestamp, $externals, $revisionTimeString);
+
+		my $infoXml = $self->RunCommand(qq|$svnCommand info "$repo"|,
+			{LogCommand => 1, LogResult => 1, HidePassword => 1,
+			passwordStart => $passwordStart,
+			passwordLength => $passwordLength } );
+
+		# eval{} everyhing bc svn returns invalid xmls in case of errors
+		eval {
+			$xPath = XML::XPath->new(xml => $infoXml);
+			$revision = "". $xPath->findvalue('/info/entry/commit/@revision'); # "". stringifies the object
+			$revisionTimeString = $xPath->findvalue('/info/entry/commit/date');
+		};
+		if ($@) {
+			$self->issueWarningMsg ("Could not parse svn info output: $@\nraw output:\n$infoXml\n");
+			return;
+		}
+		if (length $revisionTimeString >0) {
+			$revisionTimeString =~ '([\d]+)-([\d]+)-([\d]+)T([\d]+):([\d]+):([\d]+)';
+			$timestamp =  timegm($6, $5, $4, $3, $2-1, $1-1900);
+		}
+
+		push @revisions, $revision;
+		$changeTimestamp = $changeTimestamp < $timestamp ? $timestamp : $changeTimestamp;
+		$reposSeen->{$repo} = 1;
+		return unless $opts->{svnCheckExternals}; # don't recurse unless told so
+
+		my $externalsXml = $self->RunCommand(qq|$svnCommand propget "svn:externals" "$repo"|,
+			{LogCommand => 1, LogResult => 1, HidePassword => 1,
+			passwordStart => $passwordStart,
+			passwordLength => $passwordLength } );
+
+		eval {
+			$xPath = XML::XPath->new(xml => $externalsXml);
+			$externals = $xPath->findvalue("/properties/target/property[\@name='svn:externals']/text()");
+		};
+		if ($@) {
+			$self->issueWarningMsg ("Could not parse svn output: $@\nraw output:\n$externalsXml\n");
+			return;
+		}
+		while ($externals =~ /^(?:\S+)\s+(\S+)$/gm) {
+			$closure->($1) unless $reposSeen->{$1};
+		}
+	};
+
     foreach my $line (@lines) {
-        # set the generic svn command
-        $svnCommand = qq|${\($self->getSVNCommand())} info "$line" | . $options;
-    
-        # add the options
-        $svnCommand .= " --username $opts->{svnUserName}" if (length ($opts->{svnUserName}) > 0);
-        if (length ($opts->{svnPassword}) > 0) {
-            $svnCommand .= " --password ";
-            $passwordStart = length $svnCommand;
-            $svnCommand .= "$opts->{svnPassword}";
-            $passwordLength = (length $svnCommand) - $passwordStart;
-        }
-    
-        # run Subversion
-        $cmndReturn = $self->RunCommand("$svnCommand", 
-                {LogCommand => 1, LogResult => 1, HidePassword => 1,
-                passwordStart => $passwordStart, 
-                passwordLength => $passwordLength } );
-    
-        # Extract the changeset number and the date and time components
-        # XML response looks like:
-        #   <?xml version="1.0"?>
-        #     <info>
-        #       <entry
-        #          kind="dir"
-        #          path="trunk"
-        #          revision="12">
-        #         <url>file:///c:/svn-repos/SampleApp/trunk</url>
-        #         <repository>
-        #           <root>file:///c:/svn-repos</root>
-        #           <uuid>4b23f0d2-66c8-144e-84b7-b5ef7e203074</uuid>
-        #         </repository>
-        #         <commit
-        #            revision="10">
-        #           <author>eli</author>
-        #           <date>2007-10-25T00:20:04.701942Z</date>
-        #         </commit>
-        #       </entry>
-        #     </info>
-        #
-        # An error response looks like:
-        #   <?xml version="1.0"?>
-        #   <info>
-        #   </info>
-        #   file:\\\c:\svn-repos\SampleApp\branches\B9.9:  (Not a valid URL)
-        #  Make sure the response is legal XML
-        #       It must contain a </info> tag
-        #       We need to remove error info after the </info> tag
-        
-        
-        my $xmlPortion = $cmndReturn;
-        if ($xmlPortion =~ s/(?<=<\/info>).*/\n/s) {
-         
-            my $xPath = XML::XPath->new(xml => $xmlPortion);
-            if(0 < $nDepots){
-                $revisionNumber .= ',';
-            }
-            $revisionNumber .= $xPath->findvalue('/info/entry/commit/@revision');
-            $revisionTimeString = $xPath->findvalue('/info/entry/commit/date');
-            #if there are more depots, add a , at the beginnig of the value
-            $nDepots++;
-        }
-    
-        # Get the timestamp for the revision (UTC time)
-        #     2007-10-16T04:31:32.281250Z
-        
-        if (length $revisionTimeString >0) { 
-            $revisionTimeString =~ '([\d]+)-([\d]+)-([\d]+)T([\d]+):([\d]+):([\d]+)';
-            #                          sec min hr  day mon   yr
-            $currentTimestamp =  timegm($6, $5, $4, $3, $2-1, $1-1900);
-            if($changeTimestamp < $currentTimestamp) {
-                $changeTimestamp = $currentTimestamp;
-            }
-        }
-    } 
+		$closure->($line);
+	}
+
+	# all repos in @lines are compiled into list as <repo_url>:<revision_number>; rev number is md5 of that
+	$revisionNumber = join ',', @revisions;
+	# the largest (ie latest) timestamp is chosen
 
     if(length($opts->{Revision_outpp})) {
         $self->getCmdr()->setProperty($opts->{Revision_outpp}, $revisionNumber);
     }
-    
+
     return ($revisionNumber, $changeTimestamp);
 }
 
@@ -233,7 +228,7 @@ sub getSCMTag {
 sub checkoutCode
 {
     my ($self,$opts) = @_;
-    
+
     # add configuration that is stored for this config
     my $name = $self->getCfg()->getName();
     my %row = $self->getCfg()->getRow($name);
@@ -242,21 +237,21 @@ sub checkoutCode
     }
 
     $self->setSVNCommand($opts->{command});
-    
+
     # Load userName and password from the credential
-    ($opts->{SVNUSER}, $opts->{SVNPASSWD}) = 
+    ($opts->{SVNUSER}, $opts->{SVNPASSWD}) =
         $self->retrieveUserCredential($opts->{credential}, $opts->{SVNUSER}, $opts->{SVNPASSWD});
-    
+
     if (! (defined $opts->{dest})) {
         warn "dest argument required in checkoutCode";
         return;
     }
-    
+
     if((defined $opts->{CheckoutType} && $opts->{CheckoutType} eq "F") && (defined $opts->{FileName} && $opts->{FileName} eq "")) {
         warn "You must provide the file you want to download when using the file checkout option";
         return;
     }
-    
+
     # Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version|;
     my $cmndReturn = $self->RunCommand($svnCommand, {LogCommand => 1, LogResult => 0 } );
@@ -275,35 +270,35 @@ sub checkoutCode
     if(defined $opts->{CheckoutType} && $opts->{CheckoutType} eq "F"){
         $options .= qq| --depth empty|;
     }
-    
+
     my $command = "";
     my $result = "";
     my $passwordStart = 0;
     my $passwordLength = 0;
-    
+
     #checkout multiple depots
     my @svnURLs = split(/\|/, $opts->{SubversionUrl});
     my $size = @svnURLs;
 	my $ec = $self->getCmdr();
-	
+
     # When multiple paths are given in format "path1|path2|...", revision of these paths could aslo be given in format "rev1|rev2|...".
     # This is also how this plugin record revisons checked out in file ecpreflight_data/scmInfo
 	my @svnRevisions = ();
 	if (defined $opts->{SubversionRevision} && $opts->{SubversionRevision} ne "" ) {
 	    @svnRevisions = split(/\|/, $opts->{SubversionRevision});
 	}
-	
+
     foreach my $url (@svnURLs) {
         my $subdir = $opts->{dest};
         if($size ne 1) {
             $url =~ /(.*)\/(.*)/;
             $subdir .= qq{/$2};
         }
-        
+
         if (substr($subdir,-1,1) eq "\\"){
             chop($subdir);
         }
-        
+
         $command = qq{${\($self->getSVNCommand())} checkout "$url" "$subdir" $options};
         $passwordStart = 0;
         $passwordLength = 0;
@@ -323,7 +318,7 @@ sub checkoutCode
                 $command .= qq|$opts->{SVNPASSWD}|;
             }
         }
-    
+
         $result = $self->RunCommand($command, {
             LogCommand => 1,
             LogResult => 1,
@@ -331,7 +326,7 @@ sub checkoutCode
             passwordStart => $passwordStart,
             passwordLength => $passwordLength
         });
-        
+
         # extra commmand for file checkout
         if(defined $opts->{CheckoutType} && $opts->{CheckoutType} eq "F"){
             my $here = getcwd();
@@ -348,35 +343,35 @@ sub checkoutCode
                 $fileList .= qq{"$file" };
             }
             my $updateFileCommand = qq{${\($self->getSVNCommand())} up $fileList};
-            
+
             $result .= "\n" . $self->RunCommand("$updateFileCommand", {
 			    LogCommand => 1,
 				LogResult => 1
 		    });
-            
+
             chdir $here;
         }
-    
-    
+
+
         # Parse $result and grab the checked out revision from the last line.
         # Example of the last line of output from a checkout command:
         #
         # Checked out revision 1.
         #
-        
+
         $result =~ m/Checked out revision ([\d]+)./;
         my $toRevision = $1;
-    
+
         if (!$toRevision || $toRevision eq "") {
             # log that we were not able to determine the current revision
             return $result;
         }
-    
+
         my $scmKey = $self->getKeyFromUrl($url);
 
 		# Retrieve revision of latest snapshot
         my $fromRevision = $self->getLastSnapshotId($scmKey);
-	    
+
         if ($fromRevision eq "") {
             $fromRevision = $toRevision;
         } elsif ($fromRevision > 1) {
@@ -384,52 +379,52 @@ sub checkoutCode
             # report this revision twice (this run's $toVersion becomes next run's $fromVersion)
             $fromRevision++;
         }
-        
+
 		#Generate the report output from XML
         my $changeLog = $self->getChangeLog($url, $fromRevision, $toRevision, $opts);
-        				
+
 		my $xPath = XML::XPath->new(xml => $changeLog);
-            
+
         my $logSet = $xPath->find('log/logentry');
-				
+
 		my $tmp_changelog = q{};
-								
-		foreach my $logNode ($logSet->get_nodelist) {			
-			my $revision = $logNode->findvalue('@revision');			
+
+		foreach my $logNode ($logSet->get_nodelist) {
+			my $revision = $logNode->findvalue('@revision');
 			my $author = $logNode->findvalue('author');
 			my $date = $logNode->findvalue('date');
 			my $msg = $logNode->findvalue('msg');
-			
-			$tmp_changelog .= qq{Revision: $revision\n Log Message: $msg\n Author: $author\n Date: $date\n\n};	
+
+			$tmp_changelog .= qq{Revision: $revision\n Log Message: $msg\n Author: $author\n Date: $date\n\n};
 			my $pathSet = $xPath->find('paths/path', $logNode);
-			
-		
+
+
 			foreach my $pathNode ($pathSet->get_nodelist){
-			    
+
 				my $kind = $pathNode->findvalue('@kind');
 				my $action = $pathNode->findvalue('@action');
-				my $path = $pathNode->string_value;	
-                
-				$tmp_changelog .= qq{		Kind: $kind Action: $action Path: $path \n};              				
-			}		      
+				my $path = $pathNode->string_value;
+
+				$tmp_changelog .= qq{		Kind: $kind Action: $action Path: $path \n};
+			}
         }
-		    
+
 		$changeLog = $tmp_changelog;
-		
+
 		$self->setPropertiesOnJob($scmKey, $toRevision, $changeLog, $url);
-		
+
         if($opts->{Revision_outpp} && $opts->{Revision_outpp} ne ""){
             $ec->setProperty($opts->{Revision_outpp}, $toRevision);
         }
-        
+
 		my ($projectName, $scheduleName, $procedureName) = $self->getProjectAndScheduleNames();
-		
+
 		if ($scheduleName ne ""){
-			my $prop = "/projects[$projectName]/schedules[$scheduleName]/ecscm_changelogs/$scmKey";			
+			my $prop = "/projects[$projectName]/schedules[$scheduleName]/ecscm_changelogs/$scmKey";
 			$ec->setProperty($prop, $changeLog);
 		}
     }
-	
+
 	$self->createLinkToChangelogReport("Changelog Report");
 
     return $result;
@@ -439,7 +434,7 @@ sub checkoutCode
 # If directory found, return 1
 sub validSvnRepo {
     my ($self, $path) = @_;
-    
+
     my @dirs = File::Spec->splitdir(File::Spec->rel2abs($path));
 
     for(my $i = scalar(@dirs) - 1; $i > 0; $i--)
@@ -454,38 +449,38 @@ sub validSvnRepo {
 
 sub updateRepo{
     my ($self,$opts) = @_;
-    
+
     # add configuration that is stored for this config
     my $name = $self->getCfg()->getName();
     my %row = $self->getCfg()->getRow($name);
-    
+
     foreach my $k (keys %row) {
         $opts->{$k}=$row{$k};
     }
-    
+
     my $local_dir = $opts->{dest};
     $self->setSVNCommand($opts->{command});
-    
+
     if(!($self->validSvnRepo($local_dir))){
         #local directory is not a valid svn repository copy
         print qq{Directory "$local_dir" is not a valid svn repository copy};
         exit 1;
     }
-    
+
     my $cmd = qq{${\($self->getSVNCommand())} update "$local_dir"};
-    
+
     if($opts->{revision}){
         $cmd .= " --revision $opts->{revision}";
     }
-    
+
     #non interactive mode to prevent hangs
     $cmd .= " --non-interactive";
-    
+
     my ($user, $password) = $self->retrieveUserCredential($opts->{credential});
-    
+
     $cmd .= " --username $user" if ($user);
     $cmd .= " --password $password" if($password);
-    
+
     my $start;
     my $end;
 
@@ -493,40 +488,40 @@ sub updateRepo{
     #catch regex indexes
     $start = $-[0]+length("--password ");
     $end = length($password);
-    
+
     $self->RunCommand($cmd, {LogCommand=>1, HidePassword => 1, passwordStart => $start, passwordLength => $end});
-    
+
 }
 
 sub commitChanges{
     my ($self,$opts) = @_;
-    
+
     # add configuration that is stored for this config
     my $name = $self->getCfg()->getName();
     my %row = $self->getCfg()->getRow($name);
-    
+
     foreach my $k (keys %row) {
         $opts->{$k}=$row{$k};
     }
 
     $self->setSVNCommand($opts->{command});
-    
+
     # Load userName and password from the credential
-    ($opts->{SVNUSER}, $opts->{SVNPASSWD}) = 
+    ($opts->{SVNUSER}, $opts->{SVNPASSWD}) =
         $self->retrieveUserCredential($opts->{credential}, $opts->{SVNUSER}, $opts->{SVNPASSWD});
-        
+
     if (!chdir $opts->{svnDirectory}) {
         print "could not change to directory $opts->{svnDirectory}\n";
         exit 1;
     }
-    
+
     my $passwordStart;
     my $passwordLength;
     my $command = qq{${\($self->getSVNCommand())} commit };
     if($opts->{CommitMessage} && $opts->{CommitMessage} ne ""){
         $command .= qq{-m "$opts->{CommitMessage}" };
     }
-    
+
     if (length ($opts->{SVNUSER}) > 0) {
             $command .= qq| --username=$opts->{SVNUSER}|;
             $passwordLength = length $opts->{SVNPASSWD};
@@ -536,17 +531,17 @@ sub commitChanges{
                 $command .= qq|$opts->{SVNPASSWD}|;
             }
         }
-    
+
     my $result = $self->RunCommand($command, {LogCommand=>1, HidePassword => 1, passwordStart => $passwordStart,
                         passwordLength => $passwordLength});
 }
-    
+
 
 ####################################################################
 # getChangeLog
 #
 # Side Effects:
-#   
+#
 # Arguments:
 #   self -              the object reference
 #   url  -              the Subversion url
@@ -560,7 +555,7 @@ sub commitChanges{
 sub getChangeLog
 {
     my ($self, $url, $fromRevision, $toRevision, $opts) = @_;
-    
+
     #Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version|;
     my $cmndReturn = $self->RunCommand("$svnCommand", {LogCommand => 0, LogResult => 0 } );
@@ -576,10 +571,10 @@ sub getChangeLog
 	# for example a previous checkout was done to revision 90 and a subsequent
 	# checkout was called explicitly for revision 89.
 	if ($fromRevision > $toRevision) {
-		$fromRevision = $toRevision;	
+		$fromRevision = $toRevision;
 	}
     my $command = qq|${\($self->getSVNCommand())} log \"$url\" -r $fromRevision:$toRevision| . $options;
-    
+
 	my ($passwordStart, $passwordLength) = 0;
 	if (length ($opts->{SVNUSER}) > 0) {
            $command .= qq| --username=$opts->{SVNUSER}|;
@@ -624,7 +619,7 @@ sub getKeyFromUrl
 # getUrlFromKey
 #
 # Side Effects:
-#   
+#
 # Arguments:
 #   key  -              a key in a property sheet
 #
@@ -653,7 +648,7 @@ sub getUrlFromKey
 sub apf_getScmInfo
 {
     my ($self,$opts) = @_;
-        
+
     my $scmInfo = $self->pf_readFile("ecpreflight_data/scmInfo");
     $scmInfo =~ m/(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n/;
     $opts->{SubversionUrl} = $1;
@@ -718,7 +713,7 @@ sub apf_createSnapshot
 sub apf_handleExternalsProperties
 {
     my ($self,$opts) = @_;
-    
+
     my $file = File::Spec->catfile($opts->{StartDir}, "ecpreflight_data", "externalsProperty");
 
     if ( ! -f $file) {
@@ -841,16 +836,16 @@ sub apf_handleExternalsRevisions
 sub apf_driver()
 {
     my ($self,$opts) = @_;
-    
+
     if ($opts->{test}) { $self->setTestMode(1); }
         $opts->{delta} = "ecpreflight_files";
 
-    $opts->{StartDir} = File::Spec->curdir(); 
-    
+    $opts->{StartDir} = File::Spec->curdir();
+
     if (!File::Spec->file_name_is_absolute($opts->{StartDir})) {
         $opts->{StartDir} = File::Spec->rel2abs($opts->{StartDir});
     }
-	
+
 	if ($opts->{dest} eq "") {
 	    $opts->{dest} = $opts->{StartDir};
 	}
@@ -863,7 +858,7 @@ sub apf_driver()
     if ( ! $opts->{SubversionIgnoreExternals}) {
         $self->apf_handleExternalsProperties($opts);
         $self->apf_handleExternalsRevisions($opts);
-    } 
+    }
 
     $self->apf_deleteFiles($opts);
 	$self->apf_overlayDeltas($opts);
@@ -919,7 +914,7 @@ sub cpf_svn {
 sub cpf_copyDeltas()
 {
     my ($self,$opts) = @_;
-    
+
     $self->cpf_display("Collecting delta information");
 
     $self->cpf_saveScmInfo($opts,
@@ -927,22 +922,22 @@ sub cpf_copyDeltas()
       . $opts->{scm_lastchange} ."\n"
       . $opts->{scm_updatetohead} ."\n"
       . $opts->{scm_ignoreexternals} ."\n"
-      . $opts->{svn_changelist} ."\n"); 
+      . $opts->{svn_changelist} ."\n");
 
     $self->cpf_findTargetDirectory($opts);
     $self->cpf_createManifestFiles($opts);
-    
+
     my $status = "";
     my $log = "";
     my $numFiles = 0;
     my %externalsRevs = ();
-    
+
     # Collect a list of opened files.
     my @svnPaths = split(/\|/, $opts->{scm_multiple_path});
-    
+
     my $size = @svnPaths;
     foreach my $path (@svnPaths) {
-        
+
         $opts->{scm_path} = $path;
         my $path = $opts->{scm_path};
         my $credentials = "";
@@ -952,7 +947,7 @@ sub cpf_copyDeltas()
 		if ($self->isWindows()){
 		   $path =~ s/\//\\\\/g;
 		}
-		
+
         #add credential to both commands if available
         $credentials .= " --username $opts->{svnUserName}" if (length ($opts->{svnUserName}) > 0);
         $credentials .= " --password $opts->{svnPassword} " if (length ($opts->{svnPassword}) > 0);
@@ -966,47 +961,47 @@ sub cpf_copyDeltas()
             $statusCmd .= $clopt;
             $infoCmd .= $clopt;
         }
-        
+
         $status = $self->cpf_svn($opts, $statusCmd, {LogCommand => 0, LogResult => 0});
         $log = $self->cpf_svn($opts, $infoCmd, {LogCommand => 0, LogResult => 0});
         $log =~ m/URL: (.*)\/(.*)/;
         my $urlDest = $2;
-        
+
         foreach my $line(split(/\n/, $status)) {
             # Parse the output from svn opened and figure out the file name and
             # what type of change is being made.
-            
+
             my ($type, $dest, $source);
-			if ($line =~ m/^(.).*$path[\/|\\](.*)/i) {
+			if ($line =~ m/^(.).*(?:$path)[\/|\\](.*)/i) {
                 $type = $1;
-                $dest = $2; 
+                $dest = $2;
 
                 if($line =~ /  \+/) {
                     $type = "A";
                 }
-                
+
                 next if ($1 eq " " || $1 eq "?" || $1 eq "!" || $1 eq "X");
-                
+
                 if ($line =~ m/^Performing status on external item at /) {
                     # This is an external directory, collect revision information
                     # about it.
-    
+
                     # extract the relative path
-    
+
                     my $relPath = $line;
                     my $scmPath =$opts->{scm_path}; # to make next line easier
                     $relPath =~ s/^Performing status on external item at \'$scmPath//;
-    
+
                     # strip off any leading slashes
                     $relPath =~ s/^\///;
-    
+
                     $relPath =~ s/\'$//;
-    
+
                     # Do "svn info $relPath" to get the rev of this external
                     # Don't use svn subroutine since it appends the path to the command to get
                     # absolute paths when we need relative paths here.
                     my $infoOut = $self->RunCommand("${\($self->getSVNCommand())} info $relPath");
-    
+
                     my $rev = "";
                     my @infoOutLines = split(/\n/, $infoOut);
                     foreach my $l (@infoOutLines) {
@@ -1021,7 +1016,7 @@ sub cpf_copyDeltas()
                     }
                     next;
                 }
-                
+
                 $source = File::Spec->catfile($opts->{scm_path}, $dest);
                 #remove space character
                 $urlDest =~ s/\%20/ /g;
@@ -1049,9 +1044,9 @@ sub cpf_copyDeltas()
             } else {
                 next;
             }
-    
+
             # replace all \ with /
-            
+
             $source =~ s/\\/\//g;
             $dest =~ s/\\/\//g;
             # Add all files that are not deletes to the putFiles operation.
@@ -1061,7 +1056,7 @@ sub cpf_copyDeltas()
             } else {
                 $self->cpf_addDelete($dest);
             }
-            
+
         }
     }
 
@@ -1071,7 +1066,7 @@ sub cpf_copyDeltas()
         while ( my ($key, $value) = each(%externalsRevs) ) {
                 $str .= "$value $key\n";
         }
-        
+
         my $rName = File::Spec->catfile($opts->{opt_LogDir}, "externalsRev");
         $self->pf_saveDataToFile($rName, $str);
         my $uFile = File::Spec->catfile("ecpreflight_data", "externalsRev");
@@ -1079,7 +1074,7 @@ sub cpf_copyDeltas()
         $rName =~ s/\\/\//g;
         $uFile =~ s/\\/\//g;
         $self->cpf_debug("Adding file \"$rName\" to copy to \"$uFile\" ");
-        $opts->{rt_FilesToUpload}{$rName} = $uFile;        
+        $opts->{rt_FilesToUpload}{$rName} = $uFile;
     }
 
     $self->cpf_closeManifestFiles($opts);
@@ -1101,8 +1096,8 @@ sub cpf_copyDeltas()
 # handleExternals
 #
 #       Determine whether svn:externals properties have been added,
-#       modified or deleted for directories in the workspace and create 
-#       files to preserve this information so svn:externals properties can be 
+#       modified or deleted for directories in the workspace and create
+#       files to preserve this information so svn:externals properties can be
 #       properly replicated in the agent workspace.
 #------------------------------------------------------------------------------
 sub cpf_handleExternals()
@@ -1115,7 +1110,7 @@ sub cpf_handleExternals()
         $startDir = File::Spec->rel2abs($startDir);
     }
 
-    # Do "svn propget -R svn:externals".  If output is empty, there are no externals here    
+    # Do "svn propget -R svn:externals".  If output is empty, there are no externals here
     $opts->{scm_ExternalsPropertyOutput} = $self->cpf_svn($opts,"propget -R svn:externals");
 
     if ($opts->{scm_ExternalsPropertyOutput} eq "") {
@@ -1126,15 +1121,15 @@ sub cpf_handleExternals()
     # Do "svn diff" and look for any of the following:
     # 1) Added: svn:externals
     # 2) Modified: svn:externals
-    # 3) Deleted: svn:externals 
+    # 3) Deleted: svn:externals
     # For each directory with an add/modify/delete of property svn:externals, create a file
-    # listing what svn:externals should exist for the directory.  In the diff output, 
-    # for adds/modifies, look for the next line starting with a +, add this line to the 
+    # listing what svn:externals should exist for the directory.  In the diff output,
+    # for adds/modifies, look for the next line starting with a +, add this line to the
     # file and all lines after until a blank line is encountered.  For delete, create an empty file.
     # In the agent workspace, to update a directory with a change to property svn:externals,
     # do  "svn propset svn:externals -F <file> <dir with prop change>
 
-    # Don't use svn subroutine since it appends the path to the command to get 
+    # Don't use svn subroutine since it appends the path to the command to get
     # absolute paths when we need relative paths here.
     $opts->{scm_DiffOutput} = $self->RunCommand("${\($self->getSVNCommand())} diff");
 
@@ -1166,7 +1161,7 @@ sub cpf_handleExternals()
         } else {
             next;
         }
- 
+
         # Get the directory associated with this svn:external definition
         # by grabbing the line 2 lines up.  Make sure we don't go out of range.
         $pos = $counter - 2;
@@ -1176,20 +1171,20 @@ sub cpf_handleExternals()
         }
 
         $extDir = $diffLines[$pos];
-        
+
         # strip off the beginning of the line
         $extDir =~ s/^Property changes on: //;
-        
+
         # replace all \ with /
         $extDir =~ s/\\/\//g;
 
         # remove any leading or trailing spaces
         $extDir =~ s/(^\s+|\s+$)//g;
-                      
+
         $self->cpf_display("Determing status of property svn:externals on directory: $extDir");
-        
+
         push @dirsWithChangedExternals, $extDir;
-    
+
         if ($addOrModify eq "0") {
             $self->cpf_debug("Finished processing deleted property svn:externals on directory: $extDir");
         } else {
@@ -1201,25 +1196,25 @@ sub cpf_handleExternals()
                 $nextLine = $diffLines[$pos];
                 if ($nextLine =~ m/^\s+\+/) {
                     $nextLine =~ s/^\s+\+//;
-                    
+
                     # replace all \ with /
                     $nextLine =~ s/\\/\//g;
-                    
+
                     # remove any leading or trailing spaces
                     $nextLine =~ s/(^\s+|\s+$)//g;
-                
+
                     $self->cpf_debug("  target: $nextLine");
                     push @contents, $nextLine;
                     last;
                 }
                 $pos++;
             }
-        
+
             if ($#contents eq "-1") {
                 warn("Didn't find any targets for $extDir");
                 next;
             }
-        
+
             # Get the rest of the targets for this svn:externals property, if any.
             $pos = $pos + 1;
             while ($pos < $size) {
@@ -1232,22 +1227,22 @@ sub cpf_handleExternals()
 
                 # replace all \ with /
                 $nextLine =~ s/\\/\//g;
-            
+
                 # remove any leading or trailing spaces
                 $nextLine =~ s/(^\s+|\s+$)//g;
-            
+
                 $self->cpf_debug("  target: $nextLine");
                 push @contents, $nextLine;
                 $pos++;
             }
             $counter = $pos;
         }
-                      
+
         my $contentsString = "";
         foreach my $c(@contents) {
             $contentsString .= $c . "\n";
         }
-        
+
         my $fName = File::Spec->catfile($opts->{opt_LogDir}, "$#dirsWithChangedExternals");
         $self->pf_saveDataToFile($fName, $contentsString);
         my $uploadFile = File::Spec->catfile("ecpreflight_data", "$#dirsWithChangedExternals");
@@ -1257,7 +1252,7 @@ sub cpf_handleExternals()
         $self->cpf_debug("Adding file \"$fName\" to copy to \"$uploadFile\" ");
         $opts->{rt_FilesToUpload}{$fName} = $uploadFile;
     }
-        
+
     # create file called externalsProperty if @dirsWithChangedExternals is non-empty
     if ($#dirsWithChangedExternals < 0) {
         $self->cpf_display("No svn:externals properties have been changed in this workspace.");
@@ -1268,7 +1263,7 @@ sub cpf_handleExternals()
     foreach my $d (@dirsWithChangedExternals) {
         $str .= $d . "\n";
     }
-                    
+
     my $eName = File::Spec->catfile($opts->{opt_LogDir}, "externalsProperty");
     $self->pf_saveDataToFile($eName, $str);
     my $uFile = File::Spec->catfile("ecpreflight_data", "externalsProperty");
@@ -1301,35 +1296,35 @@ sub cpf_autoCommit()
         $opts->{scm_path} = $path;
 
         # Make sure none of the files have been touched since the build started.
-    
+
         $self->cpf_checkTimestamps($opts);
-    
+
         # Find the latest revision number and compare it to the previously stored
         # revision number.  If they are the same, then proceed.  Otherwise, do some
         # more advanced checks for conflicts.
-    
+
         my $out = $self->cpf_svn($opts,"info");
         $out =~ m/Last Changed Rev: ([\d]+)/;
         my $latestChange = $1;
         $self->cpf_debug("Latest revision: $latestChange");
-    
+
         # If there are any updates that overlap with the opened files, then
         # always error out.
-    
+
         my $path = $opts->{scm_path};
         $path =~ s/\\/\\\\/g;
         if ($self->isWindows()){
             $path =~ s/\//\\\\/g;
         }
         my $status = $self->cpf_svn($opts,"status " .$opts->{scm_ignoreexternals} ." --show-updates --verbose");
-        
+
         foreach my $line(split(/\n/, $status)) {
             if ($line =~ m/^(.).*$path[\/|\\](.*)/ || ($self->isWindows() && $line =~ m/^(.).*$path[\/|\\](.*)/i)) {
-    
+
                 if ($line =~ m/^Performing status on external item at /) {
                     next;
                 }
-    
+
                 my $type = $1;
                 if ($type eq " " || $type eq "?" || $type eq "X") {
                     next;
@@ -1352,29 +1347,29 @@ sub cpf_autoCommit()
                 next;
             }
         }
-    
+
         # if property svn:externals had been changed before the preflight,
         # make sure no addtional changes have been made
         if ($opts->{scm_ExternalsPropertyChanged}) {
-    
+
             $self->cpf_display("checking svn:externals for auto commit");
-    
+
             chdir($opts->{scm_path});
             my $check = "";
             $check = $self->cpf_svn($opts,"propget -R svn:externals");
-    
+
             if ($check ne $opts->{scm_ExternalsPropertyOutput}) {
                 $self->cpf_error("Property svn:externals has changed since the "
                       . " preflight build was launched.");
             }
-    
+
             $check = "";
             $check = $self->RunCommand("${\($self->getSVNCommand())} diff");
             if ($check ne $opts->{scm_DiffOutput}) {
                 $self->cpf_error("Changes have been made since the "
                       . " preflight build was launched.");
             }
-    
+
             # for now
             $self->cpf_display("svn:externals changes ok for autocommit");
         }
@@ -1387,7 +1382,7 @@ sub cpf_autoCommit()
         foreach my $path (@svnPaths) {
             $opts->{scm_path} = "";
             # Commit the changes.
-        
+
             $self->cpf_display("Committing changes from $path");
             $self->cpf_svn($opts,"commit $path -m \"" . $opts->{scm_commitComment}."\"", {LogCommand => 1, LogResult => 1});
             $self->cpf_display("Changes have been successfully submitted");
@@ -1414,7 +1409,7 @@ Subversion Options:
   --svnchangelist           Name of svn changelist to be used during preflight.
   --svnupdatetohead         Use this option to have the agent workspace created
                             during preflight be updated to HEAD.  By default,
-                            the agent workspace is updated to the revision 
+                            the agent workspace is updated to the revision
                             found in the client workspace. NOTE: there is not argument to this option.
   --svnignoreexternals      Causes the preflight process to ignore svn
                             externals. NOTE: there is not argument to this option.
@@ -1422,7 +1417,7 @@ Subversion Options:
   --svnpassword             Your svn user's password.
 ";
 
-    my %ScmOptions = ( 
+    my %ScmOptions = (
         "svnpath=s"             => \@multiplePaths,
         "svnuser=s"             => \$opts->{svnUserName},
         "svnpassword=s"         => \$opts->{svnPassword},
@@ -1435,21 +1430,21 @@ Subversion Options:
     if (!GetOptions(%ScmOptions)) {
         error($::gHelpMessage);
     }
-    
-    
+
+
     if ($::gHelp eq "1") {
         $self->cpf_display($::gHelpMessage);
         return;
     }
-    
+
     if(@multiplePaths){
         $opts->{scm_path} = join("|",@multiplePaths);
     }
-    
+
     $self->extractOption($opts,"scm_path", { required => 1, cltOption => "svnpath" });
     $self->extractOption($opts,"scm_updatetohead", { required => 0, env => "SVNUPDATETOHEAD" });
     $self->extractOption($opts,"scm_ignoreexternals", { required => 0, env => "SVNIGNOREEXTERNALS" });
-    
+
     # If the preflight is set to auto-commit, require a commit comment.
     if ($opts->{scm_autoCommit} &&
             (!defined($opts->{scm_commitComment})|| $opts->{scm_commitComment} eq "")) {
@@ -1457,16 +1452,16 @@ Subversion Options:
                 . "the provided options.  May also be passed on the command "
                 . "line using --commitComment");
     }
-    
+
     $opts->{scm_multiple_path} = $opts->{scm_path};
     my @svnPaths = split(/\|/, $opts->{scm_multiple_path});
     foreach my $path (@svnPaths) {
         $opts->{scm_path} = $path;
-        
+
         # Store the latest checked-in changelist number.
         my $out = $self->cpf_svn($opts,"info");
         my @lines = split(/\n/, $out);
-        
+
         foreach my $line (@lines) {
             if ($line =~ m/Last Changed Rev: ([\d]+)/) {
                 $opts->{scm_multiple_lastchange} .= $1 . "|";
@@ -1481,7 +1476,7 @@ Subversion Options:
             }
         }
     }
-    
+
     $self->cpf_debug("Extracted path: ".$opts->{scm_multiple_path});
     $self->cpf_debug("Latest revision: ".$opts->{scm_multiple_lastchange});
     $self->cpf_debug("URL: ".$opts->{scm_url});
@@ -1503,9 +1498,9 @@ Subversion Options:
     }
 
     # Copy the deltas to a specific location.
-    
+
     $self->cpf_copyDeltas($opts);
-    
+
     # Auto commit if the user has chosen to do so.
 
     if ($opts->{scm_autoCommit}) {
@@ -1535,7 +1530,7 @@ sub registerReports {
 
     if($fileName ne ''){
         $ec->abortOnError(0);
-        $ec->setProperty("/myJob/artifactsDirectory", '');   
+        $ec->setProperty("/myJob/artifactsDirectory", '');
         $ec->setProperty("/myJob/report-urls/@PLUGIN_KEY@ Report","jobSteps/$[jobStepId]/$fileName");
     }
 }
@@ -1579,7 +1574,7 @@ sub createLinkToChangelogReport {
 
     # e.g. /commander/pages/EC-DefectTracking-JIRA-1.0/reports?debug=1?jobId=510
     print "Creating link $target\n";
-  	
+
 	($success, $xpath, $msg) = $self->InvokeCommander({SuppressLog=>1,IgnoreError=>1}, "setProperty", $prop, $target);
 
     if (!$success) {
@@ -1594,7 +1589,7 @@ sub getSVNCommand {
     if(!length($command)) {
         $command = "svn";
     }
-    
+
     return $command;
 }
 
