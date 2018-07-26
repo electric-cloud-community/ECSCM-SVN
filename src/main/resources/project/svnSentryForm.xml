@@ -8,8 +8,8 @@
         <label>Repository:</label>
         <property>repository</property>
         <required>1</required>
-        <documentation>The Subversion repository to use.  It can take two forms: 
-            A single, specific path.  
+        <documentation>The Subversion repository to use.  It can take two forms:
+            A single, specific path.
             Multiple depot paths, separated them by a new line.
         </documentation>
     </formElement>
@@ -34,6 +34,15 @@
         <uncheckedValue>0</uncheckedValue>
         <initiallyChecked>1</initiallyChecked>
         <documentation>Enable for continuous integration monitoring by ElectricSentry.</documentation>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Check externals for updates:</label>
+        <property>svnCheckExternals</property>
+        <checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+        <documentation>Trigger the procedure if there were changes in repository externals</documentation>
     </formElement>
     <formElement>
         <property>priority</property>

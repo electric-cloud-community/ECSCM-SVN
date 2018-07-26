@@ -64,7 +64,7 @@
 
         <div id="CreateConfiguration">
             <a name='CreateConfiguration'
-                 id="CreateConfiguration"></a> 
+                 id="CreateConfiguration"></a>
 
             <h3>Plugin Configuration</h3>
 
@@ -142,7 +142,7 @@
 
         <div id="CheckoutCode">
             <a name='CheckoutCode'
-                 id="CheckoutCode"></a> 
+                 id="CheckoutCode"></a>
 
             <h3>CheckoutCode</h3>
 
@@ -226,20 +226,20 @@
                         (This is the command-line
                         '--ignore-externals' option).</td>
                     </tr>
-                    
+
                     <tr>
                         <td>Revision (output property path)</td>
                         <td>Property where the last revision number will be stored.</td>
                     </tr>
-                    
+
                 </tbody>
             </table><img src="../../plugins/@PLUGIN_KEY@/images/checkout-2.png"
                  alt="screenshot" />
         </div>
-        
+
         <div id="Update">
             <a name='Update'
-                 id="Update"></a> 
+                 id="Update"></a>
 
             <h3>Update</h3>
 
@@ -275,7 +275,7 @@
 
                         <td>Provide an specific revision to update to.</td>
                     </tr>
-                    
+
                 </tbody>
             </table><img src="../../plugins/@PLUGIN_KEY@/images/Update-1.png"
                  alt="screenshot" />
@@ -283,7 +283,7 @@
 
         <div id="CommitChanges">
             <a name='CommitChanges'
-                 id="CommitChanges"></a> 
+                 id="CommitChanges"></a>
 
             <h3>CommitChanges</h3>
 
@@ -327,7 +327,7 @@
 
         <div id="Preflight (client side)">
             <a name='Preflight (client side)'
-                 id="Preflight (client side)"></a> 
+                 id="Preflight (client side)"></a>
 
             <h3>Preflight (client side)</h3>
 
@@ -379,7 +379,7 @@
 
         <div id="Preflight (agent side)">
             <a name='Preflight (agent side)'
-                 id="Preflight (agent side)"></a> 
+                 id="Preflight (agent side)"></a>
 
             <h3>Preflight (agent side)</h3>
 
@@ -422,7 +422,7 @@
                         <td>Use this option to preflight changes
                             only from specified SVN changelist.</td>
                     </tr>
-                    
+
                     <tr>
                         <td>svnignoreexternals</td>
 
@@ -436,7 +436,7 @@
 
         <div id="getSCMTag">
             <a name='getSCMTag'
-                 id="getSCMTag"></a> 
+                 id="getSCMTag"></a>
 
             <h3>getSCMTag</h3>
 
@@ -465,7 +465,7 @@
                         path, or multiple depot paths, separated
                         them by a new line. (Required)</td>
                     </tr>
-                    
+
                     <tr>
                         <td>Revision (output property path)</td>
 
@@ -486,6 +486,11 @@
                         <td>Enable this schedule for
                         ElectricSentry.</td>
                     </tr>
+                    <tr>
+                        <td>Check externals for updates</td>
+
+                        <td>Defines whether the externals shall also be checked for updates</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -503,17 +508,17 @@
         configuration called "SVN" and we are going to checkout a
         repository from a svn server
         machine.</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-2.png"
-             alt="Fill the form" /> 
+             alt="Fill the form" />
 
         <p>The procedure now should look like this one, not you can
         run
         it</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-3.png"
-             alt="The procedure is ready to run." /> 
+             alt="The procedure is ready to run." />
 
         <p>If everything was properly set now you shoud see
         something like
         this.</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-4.png"
-             alt="The procedure result." /> 
+             alt="The procedure result." />
 
         <p>If you see everything green, the procedure worked fine,
         so you can now take a look at the logs. If you click on the
@@ -521,17 +526,17 @@
         will see something like
         this.</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-5.png"
              alt="The procedure log." />
-        
+
         <h2>Update existing svn working directory</h2>
 
         <p>Create a new "SVN - Update" step from the step picker.</p>
-        
+
         <p>Fill the parameters in the step.</p><img src="../../plugins/@PLUGIN_KEY@/images/Update-2.png"
              alt="Parameters" />
-        
+
         <p>Run the procedure and see the log</p><img src="../../plugins/@PLUGIN_KEY@/images/Update-3.png"
              alt="Log" />
-        
+
         <h2>Preflight</h2>
 
         <h3>Configuring the preflight</h3>
@@ -545,11 +550,11 @@
         configuration that you want to use, we chose SVN and
         provide a destination
         directory.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-2.png"
-             alt="" /> 
+             alt="" />
 
         <p>The procedure should look like
         this.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-3.png"
-             alt="" /> 
+             alt="" />
 
         <h3>Running the preflight</h3>
 
@@ -565,23 +570,23 @@
          You will see how it copies all the changed files to the
         server, and lauches the preflight procedure that we created
         earlier.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-4.png"
-             alt="" /> 
+             alt="" />
 
         <p>If you go to the commander jobs tab, you will see our
         recently launched
         job.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-5.png"
-             alt="" /> 
+             alt="" />
 
         <p>You can see the log file by clicking on the log
         link.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-6.png"
-             alt="" /> 
+             alt="" />
 
         <h2>Configuring a sentry schedule Form</h2>
 
         <p>In the project, select the "schedules" tab, then in the
         pop-up select the "SCM"
         type.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-1.png"
-             alt="" /> 
+             alt="" />
 
         <p>Select an step name, in this case we used "my sentry",
         also select a SVN configuration. Then you should select the
@@ -590,27 +595,27 @@
         inside the project called "runWithSentry", this procedure
         just echoes a simple "hello world"
         message</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-2.png"
-             alt="" /> 
+             alt="" />
 
         <p>After that, a new form will be shown where you should
         type our svn
         repository.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-3.png"
-             alt="" /> 
+             alt="" />
 
         <p>The schedule should look like
         this.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-4.png"
-             alt="" /> 
+             alt="" />
 
         <p>The sentry will detect new changes and execute the
         runWithSentry procedure, in our case it just prints a
         "Hello work
         message".</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-5.png"
-             alt="" /> 
+             alt="" />
 
         <p>The runWithSentry job, should be visible now from the
         jobs
         tab.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-6.png"
-             alt="" /> 
+             alt="" />
 
         <h2>How to commit changes</h2>
 
@@ -619,11 +624,11 @@
 
         <p>Fill the parameter panel with the correct
         parameters.</p><img src="../../plugins/@PLUGIN_KEY@/images/commit-1.png"
-             alt="" /> 
+             alt="" />
 
         <p>Run the procedure and see the log file if you
         want</p><img src="../../plugins/@PLUGIN_KEY@/images/commit-2.png"
-             alt="" /> 
+             alt="" />
 
         <h1>Release Notes</h1>
 
@@ -636,31 +641,31 @@
         <ul>
             <li>Added support for preflighting SVN changelists.</li>
         </ul>
-        
+
         <h2>@PLUGIN_KEY@ 3.2.4</h2>
         <ul>
             <li>Added ability to specify svn commandline utility path.</li>
         </ul>
-        
+
         <h2>@PLUGIN_KEY@ 3.2.3</h2>        <ul>            <li>The updateLastGoodAndLastCompleted procedure has been removed from this plugin.</li>            <li>Changelog will contain the last revision if no last successful job exists.</li>						        </ul>        		<h2>@PLUGIN_KEY@ 3.2.0</h2>
 
         <ul>
             <li>Revision (output property path) parameter added for checkout and sentry procedures</li>
         </ul>
-        
+
         <h2>@PLUGIN_KEY@ 3.1.0</h2>
 
         <ul>
             <li>Update procedure was added</li>
             <li>The "Update when possible" parameter was added to the preflight procedure.</li>
         </ul>
-        
+
         <h2>@PLUGIN_KEY@ 3.0.0</h2>
 
         <ul>
             <li>GWT dynamic parameters were added for the checkout procedure.</li>
         </ul>
-        
+
         <h2>@PLUGIN_KEY@ 2.0.7</h2>
 
         <ul>
@@ -670,10 +675,10 @@
 		<h2>@PLUGIN_KEY@ 2.0.6</h2>
 
         <ul>
-		    <li>Added a custom changelog report.</li>    
-            <li>The changelog now will work with the sentry schedules too.</li>                
+		    <li>Added a custom changelog report.</li>
+            <li>The changelog now will work with the sentry schedules too.</li>
         </ul>
-		
+
         <h2>@PLUGIN_KEY@ 2.0.4</h2>
 
         <ul>
@@ -683,7 +688,7 @@
             E020024</li>
 
             <li>Expose preflight method in step pickers</li>
-            
+
             <li>Support for multiple projects.</li>
         </ul>
 
