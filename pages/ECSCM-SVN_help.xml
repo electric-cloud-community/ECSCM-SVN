@@ -149,8 +149,8 @@
             <p>Downloads a private copy of the last version of the
             project. This will perform a svn checkout command in
             the desired destination.</p>
-			<p>When the procedure finishes you can check in the job, a property sheet called ecscm_changelogs,
-			you can see the changes included in this checkout since the latest. This information will be copied to the procedure too.</p>
+            <p>When the procedure finishes you can check in the job, a property sheet called ecscm_changelogs,
+            you can see the changes included in this checkout since the latest. This information will be copied to the procedure too.</p>
 
             <table class="grid">
                 <thead>
@@ -444,8 +444,8 @@
             This will monitor the repository to discover whether
             something changed, and trigger a preconfugured
             procedure.</p>
-			<p>If the procedure to execute is a checkout, the procedure will copy the changelog into the schedule in a property sheet
-			called ecscm_changelogs.</p>
+            <p>If the procedure to execute is a checkout, the procedure will copy the changelog into the schedule in a property sheet
+            called ecscm_changelogs.</p>
 
             <table class="grid">
                 <thead>
@@ -491,7 +491,7 @@
 
                         <td>Defines whether the externals shall also be checked for updates <br/>
                             Note: relative paths in external definitions are not supported
-						</td>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -632,6 +632,12 @@
         want</p><img src="../../plugins/@PLUGIN_KEY@/images/commit-2.png"
              alt="" />
 
+        <h1>Known Issues</h1>
+        <ul>
+            <li>Relative paths in external definitions are not supported
+            </li>
+        </ul>
+
         <h1>Release Notes</h1>
         <h2>@PLUGIN_KEY@ 3.3.3</h2>
         <ul>
@@ -655,7 +661,12 @@
             <li>Added ability to specify svn commandline utility path.</li>
         </ul>
 
-        <h2>@PLUGIN_KEY@ 3.2.3</h2>        <ul>            <li>The updateLastGoodAndLastCompleted procedure has been removed from this plugin.</li>            <li>Changelog will contain the last revision if no last successful job exists.</li>						        </ul>        		<h2>@PLUGIN_KEY@ 3.2.0</h2>
+        <h2>@PLUGIN_KEY@ 3.2.3</h2>
+        <ul>
+            <li>The updateLastGoodAndLastCompleted procedure has been removed from this plugin.</li>
+            <li>Changelog will contain the last revision if no last successful job exists.</li>
+        </ul>
+        <h2>@PLUGIN_KEY@ 3.2.0</h2>
 
         <ul>
             <li>Revision (output property path) parameter added for checkout and sentry procedures</li>
@@ -680,10 +691,10 @@
             <li>Step chooser name cleanup</li>
         </ul>
 
-		<h2>@PLUGIN_KEY@ 2.0.6</h2>
+        <h2>@PLUGIN_KEY@ 2.0.6</h2>
 
         <ul>
-		    <li>Added a custom changelog report.</li>
+            <li>Added a custom changelog report.</li>
             <li>The changelog now will work with the sentry schedules too.</li>
         </ul>
 
