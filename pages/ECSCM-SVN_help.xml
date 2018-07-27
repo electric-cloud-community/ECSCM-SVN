@@ -489,7 +489,9 @@
                     <tr>
                         <td>Check externals for updates</td>
 
-                        <td>Defines whether the externals shall also be checked for updates</td>
+                        <td>Defines whether the externals shall also be checked for updates <br/>
+                            Note: relative paths in external definitions are not supported
+						</td>
                     </tr>
                 </tbody>
             </table>
@@ -631,6 +633,12 @@
              alt="" />
 
         <h1>Release Notes</h1>
+        <h2>@PLUGIN_KEY@ 3.3.3</h2>
+        <ul>
+            <li>Added "Check externals" option for getSCMTag<br/>
+                Note: relative paths in external definitions are not supported
+            </li>
+        </ul>
 
         <h2>@PLUGIN_KEY@ 3.3.1</h2>
         <ul>
