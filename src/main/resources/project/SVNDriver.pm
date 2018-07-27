@@ -118,13 +118,12 @@ sub getSCMTag {
     #Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version --quiet|;
 
-    my $cmndReturn = $self->RunCommand($svnCommand, {LogCommand => 1, LogResult => 0 } );
-    $cmndReturn =~ /(\d+)\.(\d+)/;
+    my @svnVersion = split /\./, $self->RunCommand($svnCommand, {LogCommand => 1, LogResult => 0 } );
     my $options = qq| --xml|;
-    if(1 <= $1 && 5 <= $2){
+    if (1 <= $svnVersion[0] && 5 <= $svnVersion[1]){
         $options .= qq| --non-interactive|;
     }
-    if(1 <= $1 && 6 <= $2){
+    if (1 <= $svnVersion[0] && 6 <= $svnVersion[1]){
         $options .= qq| --trust-server-cert|;
     }
 
@@ -188,8 +187,15 @@ sub getSCMTag {
 			$self->issueWarningMsg ("Could not parse svn output: $@\nraw output:\n$externalsXml\n");
 			return;
 		}
-		while ($externals =~ /^(?:\S+)\s+(\S+)$/gm) {
-			$closure->($1) unless $reposSeen->{$1};
+		for my $externalDefinition (split /\r\n|\n|\r/, $externals) {
+			my $externalPath;
+		    if (1 <= $svnVersion[0] && 5 <= $svnVersion[1]) { # svn 1.5 or higher
+				($externalPath) = $externalDefinition =~ /^\s*(?:-r\d+\s+)?(\S+)\s+(?:\S+)\s*$/gm # whitespace? revision? url dir_name
+			} else { # svn prior to 1.5
+				($externalPath) = $externalDefinition =~ /^\s*(?:\S+)\s+(?:-r\d+\s+)?(\S+)\s*$/gm #whitespace? dir_name revision? url
+			}
+			next unless defined $externalPath;
+			$closure->($externalPath) unless $reposSeen->{$externalPath};
 		}
 	};
 
