@@ -490,7 +490,7 @@
                     <tr>
                         <td>Check externals for updates</td>
 
-                        <td>Defines whether the externals shall also be checked for updates <br/>
+                        <td>Defines whether the externals will also be checked for updates. svn:externals property must be given as for SVN 1.5+, i.e. [-r REV] URL[@PEG] LOCALPATH <br/>
                             Note: relative paths in external definitions are not supported
                         </td>
                     </tr>
