@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -24,6 +23,38 @@
             noshade="noshade" />
         <p>Revised on July 30, 2018</p>
 
+        <h1>Contents</h1>
+
+        <ul>
+        <li><a href="#overview">Overview</a></li>
+            <ul>
+            <li><a href="#links">Subversion Links</a></li>
+            <li><a href="#intergration">Electric Commander Integration to Subversion</a></li>
+            </ul>
+        <li><a href="#procedures">Plugin Procedures</a></li>
+            <ul>
+            <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
+            <li><a href="#CheckoutCode">CheckoutCode</a></li>
+            <li><a href="#Update">Update</a></li>
+            <li><a href="#CommitChanges">CommitChanges</a></li>
+            <li><a href="#Preflight (client side)">Preflight (client side)</a></li>
+            <li><a href="#Preflight (agent side)">Preflight (agent side)</a></li>
+            <li><a href="#getSCMTag">getSCMTag</a></li>
+            </ul>
+        <li><a href="#examples">Examples and Use Cases</a></li>
+            <ul>
+            <li><a href="#configureCheckout">Configure a Checkout</a></li>
+            <li><a href="#updateDirectory">Update existing svn working directory</a></li>
+            <li><a href="#preflight">Preflight</a></li>
+            <li><a href="#sentrySchedule">Configuring a sentry schedule Form</a></li>
+            <li><a href="#howToCommitChanges">How to commit changes</a></li>
+            </ul>
+        <li><a href="#knownIssues">Known Issues</a></li>
+        <li><a href="#releaseNotes">Release Notes</a></li>
+        </ul>
+
+        <h1 id="overview">Overview</h1>
+
         <p>Subversion (often abbreviated SVN, after the command
         name svn) is a software versioning and a revision control
         system distributed under a free license. Developers use
@@ -32,20 +63,16 @@
         Its goal is to be a mostly-compatible successor to the
         widely used Concurrent Versions System (CVS).</p>
 
-        <h2>Subversion Links</h2>
+        <h2 id="links">Subversion Links</h2>
 
         <p>More information can be found at:</p>
 
         <ul>
-            <li><a href="http://subversion.tigris.org/">Subversion
-            site</a></li>
-
-            <li>
-            <a href="http://svnbook.red-bean.com/en/1.0/svn-book.pdf">
-            Subversion technical documentation</a></li>
+            <li><a href="https://subversion.apache.org/">Subversion site</a></li>
+            <li><a href="http://svnbook.red-bean.com/en/1.7/index.html">Subversion technical documentation</a></li>
         </ul>
 
-        <h2>Electric Commander Integration to Subversion</h2>
+        <h2 id="intergration">Electric Commander Integration to Subversion</h2>
 
         <p>The ECSCM-SVN plugin allows you to connect the
         Subversion source control server to ElectricCommander. This
@@ -57,7 +84,7 @@
         <p>This plugin was developed and tested against version
         1.6.6.</p>
 
-        <h1>Plugin Procedures</h1>
+        <h1 id="procedures">Plugin Procedures</h1>
 
         <p>IMPORTANT: For all parameter descriptions below,
         required parameters are shown in
@@ -447,6 +474,7 @@
             procedure.</p>
             <p>If the procedure to execute is a checkout, the procedure will copy the changelog into the schedule in a property sheet
             called ecscm_changelogs.</p>
+            <p>"Check externals for updates" works properly with svn versions 1.5 and higher.</p>
 
             <table class="grid">
                 <thead>
@@ -499,9 +527,9 @@
         </div>
 
 
-        <h1>Examples and Use Cases</h1>
+        <h1 id="examples">Examples and Use Cases</h1>
 
-        <h2>Configure a Checkout</h2>
+        <h2 id="configureCheckout">Configure a Checkout</h2>
 
         <p>In the create step pop-up, select the tab "SCM", from
         this tab select the "Subversion - Checkout" type and click
@@ -530,7 +558,7 @@
         this.</p><img src="../../plugins/@PLUGIN_KEY@/images/checkout-5.png"
              alt="The procedure log." />
 
-        <h2>Update existing svn working directory</h2>
+        <h2 id="updateDirectory">Update existing svn working directory</h2>
 
         <p>Create a new "SVN - Update" step from the step picker.</p>
 
@@ -540,7 +568,7 @@
         <p>Run the procedure and see the log</p><img src="../../plugins/@PLUGIN_KEY@/images/Update-3.png"
              alt="Log" />
 
-        <h2>Preflight</h2>
+        <h2 id="preflight">Preflight</h2>
 
         <h3>Configuring the preflight</h3>
 
@@ -584,7 +612,7 @@
         link.</p><img src="../../plugins/@PLUGIN_KEY@/images/preflight-6.png"
              alt="" />
 
-        <h2>Configuring a sentry schedule Form</h2>
+        <h2 id="sentrySchedule">Configuring a sentry schedule Form</h2>
 
         <p>In the project, select the "schedules" tab, then in the
         pop-up select the "SCM"
@@ -620,7 +648,7 @@
         tab.</p><img src="../../plugins/@PLUGIN_KEY@/images/sentry-6.png"
              alt="" />
 
-        <h2>How to commit changes</h2>
+        <h2 id="howToCommitChanges">How to commit changes</h2>
 
         <p>Create a CommitChanges procedure from the step picker
         section</p>
@@ -633,13 +661,13 @@
         want</p><img src="../../plugins/@PLUGIN_KEY@/images/commit-2.png"
              alt="" />
 
-        <h1>Known Issues</h1>
+        <h1 id="knownIssues">Known Issues</h1>
         <ul>
             <li>Relative paths in external definitions are not supported
             </li>
         </ul>
 
-        <h1>Release Notes</h1>
+        <h1 id="releaseNotes">Release Notes</h1>
         <h2>@PLUGIN_KEY@ 3.3.3</h2>
         <ul>
             <li>Added "Check externals" option for getSCMTag<br/>
