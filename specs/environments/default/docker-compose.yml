@@ -13,8 +13,7 @@ services:
   build:
     hostname: "svnserver"
     container_name: svnserver
+    image: "electricflow/subversion:latest"
     tty: true
-    context: .
-    dockerfile: Dockerfile
     ports:
       - "3690:3690"
