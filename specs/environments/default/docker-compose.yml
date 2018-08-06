@@ -1,19 +1,23 @@
 version: '3'
 services:
   efserver:
-    image: "electricflow/efserver:latest"
+    container_name: efserver
+    hostname: "efserver"
+    build:
+      context: .
+      dockerfile: efserver.dockerfile
     ports:
       - "8000:8000"
       - "8443:8443"
       - "443:443"
       - "80:80"
-    container_name: efserver
-    hostname: "efserver"
     tty: true
   build:
-    hostname: "svnserver"
     container_name: svnserver
-    image: "electricflow/subversion:latest"
-    tty: true
+    hostname: "svnserver"
+    build:
+      context: .
+      dockerfile: svnserver.dockerfile
     ports:
       - "3690:3690"
+    tty: true
