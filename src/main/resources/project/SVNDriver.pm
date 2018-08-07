@@ -118,7 +118,7 @@ sub getSCMTag {
     #Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version --quiet|;
 
-    my @svnVersion = split /\./, $self->RunCommand($svnCommand, {LogCommand => 1, LogResult => 0 } );
+    my @svnVersion = split /\./, $self->RunCommand($svnCommand, {LogCommand => 1, LogResult => 0, DieOnError => 1} );
     my $options = qq| --xml|;
     if (1 <= $svnVersion[0] && 5 <= $svnVersion[1]){
         $options .= qq| --non-interactive|;
@@ -150,7 +150,7 @@ sub getSCMTag {
 		my ($xPath, $revision, $timestamp, $externals, $revisionTimeString);
 
 		my $infoXml = $self->RunCommand(qq|$svnCommand info "$repo"|,
-			{LogCommand => 1, LogResult => 1, HidePassword => 1,
+			{LogCommand => 1, LogResult => 1, HidePassword => 1, DieOnError => 1,
 			passwordStart => $passwordStart,
 			passwordLength => $passwordLength } );
 
@@ -175,7 +175,7 @@ sub getSCMTag {
 		return unless $opts->{svnCheckExternals}; # don't recurse unless told so
 
 		my $externalsXml = $self->RunCommand(qq|$svnCommand propget "svn:externals" "$repo"|,
-			{LogCommand => 1, LogResult => 1, HidePassword => 1,
+			{LogCommand => 1, LogResult => 1, HidePassword => 1, DieOnError => 1,
 			passwordStart => $passwordStart,
 			passwordLength => $passwordLength } );
 
@@ -260,7 +260,7 @@ sub checkoutCode
 
     # Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version|;
-    my $cmndReturn = $self->RunCommand($svnCommand, {LogCommand => 1, LogResult => 0 } );
+    my $cmndReturn = $self->RunCommand($svnCommand, { DieOnError => 1, LogCommand => 1, LogResult => 0 } );
     $cmndReturn =~ /version (\d+).(\d+)/;
     my $options = '';
     if(defined $opts->{IgnoreExternals} && $opts->{IgnoreExternals} eq "1"){
@@ -329,6 +329,7 @@ sub checkoutCode
             LogCommand => 1,
             LogResult => 1,
             HidePassword => 1,
+            DieOnError => 1,
             passwordStart => $passwordStart,
             passwordLength => $passwordLength
         });
@@ -352,7 +353,8 @@ sub checkoutCode
 
             $result .= "\n" . $self->RunCommand("$updateFileCommand", {
 			    LogCommand => 1,
-				LogResult => 1
+				LogResult => 1,
+                DieOnError => 1
 		    });
 
             chdir $here;
@@ -495,7 +497,7 @@ sub updateRepo{
     $start = $-[0]+length("--password ");
     $end = length($password);
 
-    $self->RunCommand($cmd, {LogCommand=>1, HidePassword => 1, passwordStart => $start, passwordLength => $end});
+    $self->RunCommand($cmd, {LogCommand=>1, HidePassword => 1, DieOnError => 1, passwordStart => $start, passwordLength => $end});
 
 }
 
@@ -538,7 +540,7 @@ sub commitChanges{
             }
         }
 
-    my $result = $self->RunCommand($command, {LogCommand=>1, HidePassword => 1, passwordStart => $passwordStart,
+    my $result = $self->RunCommand($command, {LogCommand=>1, DieOnError => 1, HidePassword => 1, passwordStart => $passwordStart,
                         passwordLength => $passwordLength});
 }
 
@@ -564,7 +566,7 @@ sub getChangeLog
 
     #Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version|;
-    my $cmndReturn = $self->RunCommand("$svnCommand", {LogCommand => 0, LogResult => 0 } );
+    my $cmndReturn = $self->RunCommand("$svnCommand", { DieOnError => 1, LogCommand => 0, LogResult => 0 } );
     $cmndReturn =~ /version (\d+).(\d+)/;
     my $options = qq| --xml -v|;
     if(1 <= $1 && 5 <= $2){
@@ -596,6 +598,7 @@ sub getChangeLog
         LogCommand => 1,
         HidePassword => 1,
         LogResult => 0,
+        DieOnError => 1,
         passwordStart => $passwordStart,
         passwordLength => $passwordLength
     });
@@ -744,7 +747,7 @@ sub apf_handleExternalsProperties
             print "Directory being processed is: $_\n";
 
             $command = "${\($self->getSVNCommand())} propget svn:externals $_";
-            $res = $self->RunCommand($command, {LogCommand=>1});
+            $res = $self->RunCommand($command, { LogCommand=>1, DieOnError => 1 });
             print "Command:\n$command\nHad the following output:\n$res\n\n";
             my @targets = split(/\n/, $res);
             my @dirs = ();
@@ -758,12 +761,12 @@ sub apf_handleExternalsProperties
             if ( -f $file && ! -z $file ) {
                 print "setting property svn:externals for $_...\n";
                 $command = "${\($self->getSVNCommand())} propset svn:externals -F $file $_";
-                $res = $self->RunCommand($command, {LogCommand => 1});
+                $res = $self->RunCommand($command, { LogCommand => 1, DieOnError => 1 });
                 print "Command:\n$command\nHad the following output:\n$res\n\n";
             } else {
                 print "deleting property svn:externals for $_...\n";
                 $command = "${\($self->getSVNCommand())} propdel svn:externals $_";
-                $res = $self->RunCommand($command, {LogCommand=>1});
+                $res = $self->RunCommand($command, { LogCommand=>1, DieOnError => 1 });
                 print "Command:\n$command\nHad the following output:\n$res\n\n";
 
                 # should we delete the associated directories as well (in @dirs)?
@@ -771,7 +774,7 @@ sub apf_handleExternalsProperties
             }
             print "Running update on command on $_ to bring in new svn:externals properties\n";
             $command = "${\($self->getSVNCommand())} update $_";
-            $res = $self->RunCommand($command, {LogCommand=>1});
+            $res = $self->RunCommand($command, { LogCommand=>1, DieOnError => 1 });
             print "Command:\n$command\nHad the following output:\n$res\n\n";
         }
         $count++;
@@ -825,7 +828,7 @@ sub apf_handleExternalsRevisions
             print "Attempting to update directory $ext to revision $rev\n";
 
             $command = "${\($self->getSVNCommand())} update -r$rev $ext";
-            $res = $self->RunCommand($command, {LogCommand => 1});
+            $res = $self->RunCommand($command, { DieOnError => 1, LogCommand => 1});
             print "Command:\n$command\nHad the following output:\n$res\n\n";
         }
     }
@@ -888,7 +891,7 @@ sub cpf_svn {
     }
     #Check the SVN version. Before 1.5, it doesn't allow --non-interactive
     my $svnCommand = qq|${\($self->getSVNCommand())} --version|;
-    my $cmndReturn = $self->RunCommand("$svnCommand", {LogCommand => 0, LogResult => 0 } );
+    my $cmndReturn = $self->RunCommand("$svnCommand", {LogCommand => 0, DieOnError => 1 , LogResult => 0 } );
     $cmndReturn =~ /version (\d+).(\d+)/;
     my $additionalOptions = "";
     if(1 <= $1 && 5 <= $2){
