@@ -6,6 +6,7 @@ import spock.lang.Shared
 class CommitChanges extends TestHelper {
     @Shared projectName
     @Shared checkoutProjectName
+    static final String agentHost  = System.getenv('EFAGENT_HOST')    ?: 'efagent-svn'
 
     def doSetupSpec() {
         createConfig()
@@ -30,7 +31,7 @@ class CommitChanges extends TestHelper {
                 SubversionUrl   : "svn://${repoServer}/test_1",
                 dest            : "test_1",
                 Revision_outpp  : "/myJob/test_1_revision"
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         assert result?.outcome == 'success'
         def workspace = dsl("getJobInfo(jobId: '${result.jobId}')").job?.workspace?.unix[0]
@@ -46,7 +47,7 @@ class CommitChanges extends TestHelper {
                 action  : 'write',
                 basedir : workspace + '/test_1',
                 content : "at revision ${revision}\n"
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         assert result?.outcome == 'success'
         def configNameLocal = configName // https://issues.apache.org/jira/browse/GROOVY-5776
@@ -60,7 +61,7 @@ class CommitChanges extends TestHelper {
                     config          : configNameLocal, // https://issues.apache.org/jira/browse/GROOVY-5776
                     CommitMessage   : "Fresh files at revision #" + revision,
                     svnDirectory    :  workspace + '/test_1/' + workdir,
-                ], [], null, 3600
+                ], [], agentHost, 3600
             )
             assert result?.outcome == 'success'
         }
@@ -72,7 +73,7 @@ class CommitChanges extends TestHelper {
                 SubversionUrl   : "svn://${repoServer}/test_1",
                 dest            : "test_1_checkout_after_commit",
                 Revision_outpp  : "/myJob/test_1_revision"
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         workspace = dsl("getJobInfo(jobId: '${result.jobId}')").job?.workspace?.unix[0]
         then:
@@ -87,7 +88,7 @@ class CommitChanges extends TestHelper {
                 files   : files.join("\n"),
                 action  : 'read',
                 basedir : workspace + '/test_1_checkout_after_commit'
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         then:
         assert result?.outcome == 'success'

@@ -5,6 +5,7 @@ import spock.lang.Shared
 
 class CheckoutCode extends TestHelper {
     @Shared projectName
+    static final String agentHost  = System.getenv('EFAGENT_HOST')    ?: 'efagent-svn'
 
     def doSetupSpec() {
         createConfig()
@@ -25,7 +26,7 @@ class CheckoutCode extends TestHelper {
                 dest            : 'test_1',
                 Revision_outpp  : "/myJob/test_1_revision",
                 IgnoreExternals : IgnoreExternals
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         then: 'Procedure runs'
         assert result?.outcome == 'success'
@@ -42,7 +43,7 @@ class CheckoutCode extends TestHelper {
                 files   : files.join("\n"),
                 action  : 'readable',
                 basedir : workspace
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         then: 'Procedure runs'
         assert result?.outcome == 'success'

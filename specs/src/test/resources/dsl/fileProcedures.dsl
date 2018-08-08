@@ -1,6 +1,10 @@
+def resName = args.resourceName
+
 project "ECSpec", {
     procedure "Files", {
+        resourceName = resName
         step 'Files', {
+            resourceName = resName
             shell = 'ec-perl'
             command = '''
 #

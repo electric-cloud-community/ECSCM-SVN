@@ -9,6 +9,7 @@ class Update extends TestHelper {
     @Shared commitProjectName
     @Shared updateProjectName
     @Shared revision
+    static final String agentHost  = System.getenv('EFAGENT_HOST')    ?: 'efagent-svn'
 
     def doSetupSpec() {
         createConfig()
@@ -41,7 +42,7 @@ class Update extends TestHelper {
                     SubversionUrl   : "svn://${repoServerLocal}/test_1",
                     dest            : it,
                     Revision_outpp  : "/myJob/test_1_revision"
-                ], [], null, 3600
+                ], [], agentHost, 3600
             )
             assert result?.outcome == 'success'
             workspaces[it] = dsl("getJobInfo(jobId: '${result.jobId}')").job?.workspace?.unix[0]
@@ -59,7 +60,7 @@ class Update extends TestHelper {
                 action  : 'write',
                 basedir : workspaces['test_1_commit'] + '/test_1_commit',
                 content : "${revision}"
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         assert result?.outcome == 'success'
         files.each {
@@ -71,7 +72,7 @@ class Update extends TestHelper {
                     config          : configNameLocal, // https://issues.apache.org/jira/browse/GROOVY-5776
                     CommitMessage   : "Fresh files at revision #" + revision,
                     svnDirectory    :  workspaces['test_1_commit'] + '/test_1_commit/' + workdir,
-                ], [], null, 3600
+                ], [], agentHost, 3600
             )
             assert result?.outcome == 'success'
         }
@@ -83,7 +84,7 @@ class Update extends TestHelper {
             [
                 config          : configName,
                 dest            : workspaces['test_1_update'] + "/test_1_update",
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         then: 'Procedure runs'
         assert result?.outcome == 'success'
@@ -95,7 +96,7 @@ class Update extends TestHelper {
                 files   : files.join("\n"),
                 action  : 'read',
                 basedir : workspaces['test_1_update'] + '/test_1_update'
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         then:
         assert result?.outcome == 'success'

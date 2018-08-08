@@ -1,6 +1,8 @@
 version: '3'
 services:
   efserver:
+    container_name: efserver
+    hostname: "efserver"
     image: "electricflow/efserver:latest"
     ports:
       - "8000:8000"

@@ -8,6 +8,7 @@ class getSCMTag extends TestHelper {
     @Shared basedir
     @Shared checkoutProjectName
     @Shared revision
+    static final String agentHost  = System.getenv('EFAGENT_HOST')    ?: 'efagent-svn'
 
     def doSetupSpec() {
         createConfig()
@@ -29,7 +30,7 @@ class getSCMTag extends TestHelper {
                 dest             : "test_1",
                 Revision_outpp   : "/myJob/revision",
                 svnCheckExternals: svnCheckExternals
-            ], [], null, 3600
+            ], [], agentHost, 3600
         )
         then: 'Procedure runs'
         assert result?.outcome == 'success'
