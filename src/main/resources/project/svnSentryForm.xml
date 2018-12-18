@@ -28,21 +28,31 @@
     </formElement>
     <formElement>
         <type>checkbox</type>
-        <label>Enabled for ElectricSentry:</label>
-        <property>TriggerFlag</property>
-        <checkedValue>2</checkedValue>
-        <uncheckedValue>0</uncheckedValue>
-        <initiallyChecked>1</initiallyChecked>
-        <documentation>Enable for continuous integration monitoring by ElectricSentry.</documentation>
-    </formElement>
-    <formElement>
-        <type>checkbox</type>
         <label>Check externals for updates:</label>
         <property>svnCheckExternals</property>
         <checkedValue>1</checkedValue>
         <uncheckedValue>0</uncheckedValue>
         <initiallyChecked>0</initiallyChecked>
         <documentation>Trigger the procedure if there were changes in repository externals</documentation>
+    </formElement>
+   <formElement>
+        <!-- http://jira.electric-cloud.com/browse/ECPSCMGIT-200 -->
+        <type>checkbox</type>
+        <label>Run Schedule Even if Another Instance is Running:</label>
+        <property>runDuplicates</property>
+        <checkedValue>1</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>0</initiallyChecked>
+        <documentation>If checked, the schedule will be launched even if the another instance of this schedule is already running.</documentation>
+    </formElement>
+    <formElement>
+        <type>checkbox</type>
+        <label>Enabled for ElectricSentry:</label>
+        <property>TriggerFlag</property>
+        <checkedValue>2</checkedValue>
+        <uncheckedValue>0</uncheckedValue>
+        <initiallyChecked>1</initiallyChecked>
+        <documentation>Enable for continuous integration monitoring by ElectricSentry.</documentation>
     </formElement>
     <formElement>
         <property>priority</property>
