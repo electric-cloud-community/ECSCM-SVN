@@ -1,0 +1,27 @@
+version: '3'
+services:
+  efserver:
+    container_name: efserver
+    hostname: "efserver"
+    image: "electricflow/efserver:latest"
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "443:443"
+      - "80:80"
+  efagent-svn:
+    container_name: efagent-svn
+    hostname: "efagent-svn"
+    build:
+      context: .
+      dockerfile: efagent-svn.dockerfile
+    ports:
+      - "7808:7808"
+  svnserver:
+    container_name: svnserver
+    hostname: "svnserver"
+    build:
+      context: .
+      dockerfile: svnserver.dockerfile
+    ports:
+      - "3690:3690"

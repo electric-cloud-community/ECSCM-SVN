@@ -174,8 +174,8 @@ sub getSCMTag {
 		$reposSeen->{$repo} = 1;
 		return unless $opts->{svnCheckExternals}; # don't recurse unless told so
 
-		my $externalsXml = $self->RunCommand(qq|$svnCommand propget "svn:externals" "$repo"|,
-			{LogCommand => 1, LogResult => 1, HidePassword => 1,
+		my $externalsXml = $self->RunCommand(qq{$svnCommand propget "svn:externals" "$repo" 2>/dev/null | tee },
+			{LogCommand => 1, LogResult => 1, HidePassword => 1, IgnoreError => 1,
 			passwordStart => $passwordStart,
 			passwordLength => $passwordLength } );
 
