@@ -6,6 +6,7 @@
         <property>config</property>
         <required>1</required>
         <documentation>This parameter must have the name of the configuration created in the "Plugin Configuration Parameters" section for this plugin.</documentation>
+        <configuration>1</configuration>
     </formElement>
     <formElement>
         <type>entry</type>

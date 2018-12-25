@@ -7,6 +7,23 @@
         <workspaceName></workspaceName>
         <propertySheet>
             <property>
+                <propertyName>ec_formXmlCompliant</propertyName>
+                <value>true</value>
+            </property>
+            <property>
+                <propertyName>ec_config</propertyName>
+                <propertySheet>
+                    <property>
+                        <propertyName>configLocation</propertyName>
+                        <value>/plugins/ECSCM/project/scm_cfgs</value>
+                    </property>
+                    <property>
+                        <propertyName>form</propertyName>
+                        <value></value>
+                    </property>
+                </propertySheet>
+            </property>
+            <property>
                 <propertyName>ec_setup</propertyName>
                 <value></value>
                 <expandable>0</expandable>
