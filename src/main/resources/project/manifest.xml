@@ -29,6 +29,10 @@
     <xpath>//property[propertyName=&quot;createConfig&quot;]/value</xpath>
   </file>
   <file>
+    <path>svnCreateConfigForm.xml</path>
+    <xpath>//property[propertyName=&quot;ec_config&quot;]/propertySheet/property[propertyName=&quot;form&quot;]/value</xpath>
+  </file>
+  <file>
     <path>svnEditConfigForm.xml</path>
     <xpath>//property[propertyName=&quot;editConfig&quot;]/value</xpath>
   </file>
