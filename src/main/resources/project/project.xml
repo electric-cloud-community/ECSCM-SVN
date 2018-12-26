@@ -19,7 +19,7 @@
                     </property>
                     <property>
                         <propertyName>form</propertyName>
-                        <value></value>
+                        <value>$[/projects/@PLUGIN_NAME@/procedures/CreateConfiguration/ec_parameterForm]</value>
                     </property>
                 </propertySheet>
             </property>
@@ -697,6 +697,10 @@
             </acl>
             <projectName>ECSCM-SVN-1.0</projectName>
             <propertySheet>
+                <property>
+                    <propertyName>ec_parameterForm</propertyName>
+                    <value></value>
+                </property>
                 <property>
                     <propertyName>ec_customEditorData</propertyName>
                     <propertySheet>
