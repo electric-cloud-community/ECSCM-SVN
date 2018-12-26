@@ -30,7 +30,7 @@
   </file>
   <file>
     <path>svnCreateConfigForm.xml</path>
-    <xpath>//property[propertyName=&quot;ec_config&quot;]/propertySheet/property[propertyName=&quot;form&quot;]/value</xpath>
+    <xpath>//procedure[procedureName=&quot;CreateConfiguration&quot;]/propertySheet/property[propertyName=&quot;ec_parameterForm&quot;]/value</xpath>
   </file>
   <file>
     <path>svnEditConfigForm.xml</path>
