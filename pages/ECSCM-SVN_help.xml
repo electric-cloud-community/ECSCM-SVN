@@ -522,6 +522,12 @@
                             Note: relative paths in external definitions are not supported
                         </td>
                     </tr>
+                    <tr>
+                        <td>Run Schedule Even if Another Instance is Running</td>
+
+                        <td>If checked, the schedule will be launched even if the another instance of this schedule is already running.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

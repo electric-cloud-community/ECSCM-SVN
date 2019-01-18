@@ -3,6 +3,7 @@
     <label>Continuous Integration - Subversion</label>
     <version>2.1.0</version>
     <description>A schedule that is enabled for ElectricSentry continuous integration with Subversion.</description>
+    <help>/commander/pages/@PLUGIN_NAME@/@PLUGIN_KEY@_help?s=Administration&amp;ss=Plugins#getSCMTag</help>
     <formElement>
         <type>textarea</type>
         <label>Repository:</label>
