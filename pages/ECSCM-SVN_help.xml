@@ -21,7 +21,7 @@
         <p>Plugin Version @PLUGIN_VERSION@</p>
         <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;"
             noshade="noshade" />
-        <p>Revised on December 26, 2018</p>
+        <p>Revised on May 24, 2019</p>
 
         <h1>Contents</h1>
 
@@ -674,6 +674,10 @@
         </ul>
 
         <h1 id="releaseNotes">Release Notes</h1>
+
+    <h2 id="3.4.1">@PLUGIN_KEY@ 3.4.1</h2>
+    <p>Renaming from "Electric Cloud" to "CloudBees"</p>
+
         <h2>@PLUGIN_KEY@ 3.4.0</h2>
         <ul>
             <li>Option "Run Schedule Even if Another Instance is Running" has been added for Sentry schedules.</li>
@@ -853,4 +857,4 @@
         </ul>
     </div>
 </body>
-</html>
+</html>
