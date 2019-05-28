@@ -7,7 +7,7 @@
     <meta content="text/html; charset=us-ascii"
           http-equiv="content-type" />
 
-    <title>Electric Commander Plugin for Subversion</title>
+    <title>CloudBees Flow Plugin for Subversion</title>
     <link rel="stylesheet"
           href="../../plugins/@PLUGIN_KEY@/pluginhelp.css"
           type="text/css"
@@ -21,7 +21,7 @@
         <p>Plugin Version @PLUGIN_VERSION@</p>
         <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;"
             noshade="noshade" />
-        <p>Revised on May 24, 2019</p>
+        <p>Revised on May 28, 2019</p>
 
         <h1>Contents</h1>
 
@@ -29,7 +29,7 @@
         <li><a href="#overview">Overview</a></li>
             <ul>
             <li><a href="#links">Subversion Links</a></li>
-            <li><a href="#intergration">Electric Commander Integration to Subversion</a></li>
+            <li><a href="#intergration">CloudBees Flow Integration to Subversion</a></li>
             </ul>
         <li><a href="#procedures">Plugin Procedures</a></li>
             <ul>
@@ -72,10 +72,10 @@
             <li><a href="http://svnbook.red-bean.com/en/1.7/index.html">Subversion technical documentation</a></li>
         </ul>
 
-        <h2 id="intergration">Electric Commander Integration to Subversion</h2>
+        <h2 id="intergration">CloudBees Flow Integration to Subversion</h2>
 
         <p>The ECSCM-SVN plugin allows you to connect the
-        Subversion source control server to ElectricCommander. This
+        Subversion source control server to CloudBees Flow. This
         plugin enables you to perform code checkouts, preflight
         builds, and continuous integration.</p>
 
@@ -106,7 +106,7 @@
             them.<br />
             <br />
              Plugin configurations are created by going to the
-            Electric Commander "Administration" tab, then to the
+            CloudBees Flow "Administration" tab, then to the
             "Source Control" sub-tab.</p>
             <!-- For all parameters, the parameter name should be *exactly* the same as it appears in the
                                         Parameter Panel, and the first sentence(s) of the description should be
