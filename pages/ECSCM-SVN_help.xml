@@ -7,7 +7,7 @@
     <meta content="text/html; charset=us-ascii"
           http-equiv="content-type" />
 
-    <title>CloudBees Flow Plugin for Subversion</title>
+    <title>CloudBees CD Plugin for Subversion</title>
     <link rel="stylesheet"
           href="../../plugins/@PLUGIN_KEY@/pluginhelp.css"
           type="text/css"
@@ -29,7 +29,7 @@
         <li><a href="#overview">Overview</a></li>
             <ul>
             <li><a href="#links">Subversion Links</a></li>
-            <li><a href="#intergration">CloudBees Flow Integration to Subversion</a></li>
+            <li><a href="#intergration">CloudBees CD Integration to Subversion</a></li>
             </ul>
         <li><a href="#procedures">Plugin Procedures</a></li>
             <ul>
@@ -72,10 +72,10 @@
             <li><a href="http://svnbook.red-bean.com/en/1.7/index.html">Subversion technical documentation</a></li>
         </ul>
 
-        <h2 id="intergration">CloudBees Flow Integration to Subversion</h2>
+        <h2 id="intergration">CloudBees CD Integration to Subversion</h2>
 
         <p>The ECSCM-SVN plugin allows you to connect the
-        Subversion source control server to CloudBees Flow. This
+        Subversion source control server to CloudBees CD. This
         plugin enables you to perform code checkouts, preflight
         builds, and continuous integration.</p>
 
@@ -106,7 +106,7 @@
             them.<br />
             <br />
              Plugin configurations are created by going to the
-            CloudBees Flow "Administration" tab, then to the
+            CloudBees CD "Administration" tab, then to the
             "Source Control" sub-tab.</p>
             <!-- For all parameters, the parameter name should be *exactly* the same as it appears in the
                                         Parameter Panel, and the first sentence(s) of the description should be
@@ -675,8 +675,11 @@
 
         <h1 id="releaseNotes">Release Notes</h1>
 
-    <h2 id="3.4.1">@PLUGIN_KEY@ 3.4.1</h2>
-    <p>Renaming from "Electric Cloud" to "CloudBees"</p>
+        <h2 id="3.4.2">@PLUGIN_KEY@ 3.4.2</h2>
+        <p>Renaming from "CloudBees Flow" to "CloudBees CD"</p>
+
+        <h2 id="3.4.1">@PLUGIN_KEY@ 3.4.1</h2>
+        <p>Renaming from "Electric Cloud" to "CloudBees"</p>
 
         <h2>@PLUGIN_KEY@ 3.4.0</h2>
         <ul>
@@ -857,4 +860,4 @@
         </ul>
     </div>
 </body>
-</html>
+</html>
